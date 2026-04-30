@@ -15,6 +15,7 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import { ShieldCheck, UserPlus, Trash2, LogOut, Loader2 } from "lucide-react";
+import { BrandingSection } from "@/components/BrandingSection";
 import { toast } from "sonner";
 
 interface Lawyer {
