@@ -14,6 +14,45 @@ export type Database = {
   }
   public: {
     Tables: {
+      app_settings: {
+        Row: {
+          app_subtitle: string
+          app_title: string
+          favicon_url: string | null
+          id: string
+          logo_url: string | null
+          meta_author: string
+          meta_description: string
+          og_title: string | null
+          updated_at: string
+          updated_by: string | null
+        }
+        Insert: {
+          app_subtitle?: string
+          app_title?: string
+          favicon_url?: string | null
+          id?: string
+          logo_url?: string | null
+          meta_author?: string
+          meta_description?: string
+          og_title?: string | null
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Update: {
+          app_subtitle?: string
+          app_title?: string
+          favicon_url?: string | null
+          id?: string
+          logo_url?: string | null
+          meta_author?: string
+          meta_description?: string
+          og_title?: string | null
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Relationships: []
+      }
       appointments: {
         Row: {
           appointment_date: string
