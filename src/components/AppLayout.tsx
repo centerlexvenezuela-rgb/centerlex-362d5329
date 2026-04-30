@@ -102,7 +102,7 @@ export const AppLayout = () => {
         </nav>
       </div>
 
-      <main className="flex-1 md:pt-0 pt-28 overflow-auto">
+      <main className="flex-1 md:pt-0 pt-36 overflow-auto">
         <div className="container max-w-7xl py-6 md:py-8">
           <Outlet />
         </div>
