@@ -7,6 +7,8 @@ import { AuthProvider } from "@/hooks/useAuth";
 import { ProtectedRoute } from "@/components/ProtectedRoute";
 import { AppLayout } from "@/components/AppLayout";
 import Auth from "./pages/Auth";
+import AdminAuth from "./pages/AdminAuth";
+import AdminPanel from "./pages/AdminPanel";
 import Dashboard from "./pages/Dashboard";
 import Clients from "./pages/Clients";
 import Agenda from "./pages/Agenda";
@@ -27,7 +29,16 @@ const App = () => (
         <AuthProvider>
           <Routes>
             <Route path="/auth" element={<Auth />} />
-            <Route element={<ProtectedRoute><AppLayout /></ProtectedRoute>}>
+            <Route path="/admin/login" element={<AdminAuth />} />
+            <Route
+              path="/admin"
+              element={
+                <ProtectedRoute requireRole="admin">
+                  <AdminPanel />
+                </ProtectedRoute>
+              }
+            />
+            <Route element={<ProtectedRoute requireRole="lawyer"><AppLayout /></ProtectedRoute>}>
               <Route path="/" element={<Dashboard />} />
               <Route path="/clientes" element={<Clients />} />
               <Route path="/agenda" element={<Agenda />} />

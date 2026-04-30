@@ -2,8 +2,15 @@ import { Navigate } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
 import { Scale } from "lucide-react";
 
-export const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
-  const { session, loading } = useAuth();
+interface Props {
+  children: React.ReactNode;
+  requireRole?: "admin" | "lawyer";
+  redirectTo?: string;
+}
+
+export const ProtectedRoute = ({ children, requireRole = "lawyer", redirectTo }: Props) => {
+  const { session, role, loading } = useAuth();
+
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-background">
@@ -11,6 +18,15 @@ export const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
       </div>
     );
   }
-  if (!session) return <Navigate to="/auth" replace />;
+
+  if (!session) {
+    return <Navigate to={redirectTo ?? (requireRole === "admin" ? "/admin/login" : "/auth")} replace />;
+  }
+
+  if (role && role !== requireRole) {
+    // logged in but wrong role
+    return <Navigate to={requireRole === "admin" ? "/admin/login" : "/auth"} replace />;
+  }
+
   return <>{children}</>;
 };
