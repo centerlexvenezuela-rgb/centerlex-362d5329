@@ -98,6 +98,7 @@ const AdminPanel = () => {
       </header>
 
       <main className="max-w-6xl mx-auto px-6 py-8 space-y-8">
+        <BrandingSection />
         {/* Crear nuevo abogado */}
         <Card className="p-6 shadow-elegant">
           <div className="flex items-center gap-2 mb-4">
