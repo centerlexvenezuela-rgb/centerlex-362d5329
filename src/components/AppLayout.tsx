@@ -84,19 +84,19 @@ export const AppLayout = () => {
             <LogOut className="h-4 w-4" />
           </Button>
         </div>
-        <nav className="flex overflow-x-auto px-2 pb-2 gap-1 scrollbar-none">
+        <nav className="grid grid-cols-3 gap-1 px-2 pb-2">
           {nav.map(({ to, label, icon: Icon, end }) => (
             <NavLink
               key={to}
               to={to}
               end={end}
               className={({ isActive }) => cn(
-                "flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs whitespace-nowrap transition-colors",
-                isActive ? "bg-sidebar-accent text-sidebar-accent-foreground" : "text-sidebar-foreground/70"
+                "flex flex-col items-center justify-center gap-1 px-2 py-2 rounded-md text-[11px] leading-tight text-center transition-colors",
+                isActive ? "bg-sidebar-accent text-sidebar-accent-foreground" : "text-sidebar-foreground/70 hover:bg-sidebar-accent/40"
               )}
             >
-              <Icon className="h-3.5 w-3.5" />
-              {label}
+              <Icon className="h-4 w-4" />
+              <span className="truncate max-w-full">{label}</span>
             </NavLink>
           ))}
         </nav>
