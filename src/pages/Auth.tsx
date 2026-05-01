@@ -79,17 +79,21 @@ const Auth = () => {
           </p>
         </div>
         <p className="relative text-xs text-primary-foreground/50">
-          © {new Date().getFullYear()} Lex Office
+          © {new Date().getFullYear()} {branding.app_title}
         </p>
       </div>
 
       <div className="flex items-center justify-center p-6">
         <Card className="w-full max-w-md p-8 shadow-elegant">
           <div className="lg:hidden flex items-center gap-3 mb-6">
-            <div className="h-10 w-10 rounded bg-gradient-gold flex items-center justify-center shadow-gold">
-              <Scale className="h-5 w-5 text-primary" />
+            <div className="h-10 w-10 rounded bg-gradient-gold flex items-center justify-center shadow-gold overflow-hidden">
+              {branding.logo_url ? (
+                <img src={branding.logo_url} alt={branding.app_title} className="h-full w-full object-cover" />
+              ) : (
+                <Scale className="h-5 w-5 text-primary" />
+              )}
             </div>
-            <h1 className="font-serif text-2xl">Lex Office</h1>
+            <h1 className="font-serif text-2xl">{branding.app_title}</h1>
           </div>
           <h2 className="font-serif text-2xl mb-1">Acceso de abogados</h2>
           <p className="text-sm text-muted-foreground mb-6">
