@@ -12,7 +12,7 @@ import {
 import { cn } from "@/lib/utils";
 
 const nav = [
-  { to: "/", label: "Inicio", icon: Scale, end: true },
+  { to: "/app", label: "Inicio", icon: Scale, end: true },
   { to: "/clientes", label: "Clientes", icon: Users },
   { to: "/agenda", label: "Agenda", icon: Calendar },
   { to: "/expedientes", label: "Expedientes", icon: FolderOpen },
@@ -22,7 +22,7 @@ const nav = [
 
 // Mobile: visible directly in the bar
 const mobilePrimary = [
-  { to: "/", label: "Inicio", icon: Scale, end: true },
+  { to: "/app", label: "Inicio", icon: Scale, end: true },
   { to: "/buscar", label: "Búsqueda", icon: Search },
 ];
 const mobilePrimaryPaths = mobilePrimary.map((n) => n.to);
