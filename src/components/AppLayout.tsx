@@ -1,5 +1,5 @@
 import { NavLink, Outlet, useNavigate } from "react-router-dom";
-import { Scale, Users, Calendar, FolderOpen, Search, MessageSquare, LogOut, Menu } from "lucide-react";
+import { Scale, Users, Calendar, FolderOpen, Search, MessageSquare, LogOut, Menu, KeyRound } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { useBranding } from "@/hooks/useBranding";
 import { Button } from "@/components/ui/button";
@@ -75,8 +75,20 @@ export const AppLayout = () => {
             </NavLink>
           ))}
         </nav>
-        <div className="p-3 border-t border-sidebar-border">
+        <div className="p-3 border-t border-sidebar-border space-y-1">
           <p className="text-xs text-sidebar-foreground/60 px-3 mb-2 truncate">{user?.email}</p>
+          <NavLink
+            to="/cuenta"
+            className={({ isActive }) => cn(
+              "flex items-center gap-3 px-3 py-2.5 rounded-md text-sm transition-colors",
+              isActive
+                ? "bg-sidebar-accent text-sidebar-accent-foreground border-l-2 border-accent"
+                : "hover:bg-sidebar-accent/50 text-sidebar-foreground/80"
+            )}
+          >
+            <KeyRound className="h-4 w-4" />
+            Mi cuenta
+          </NavLink>
           <Button onClick={handleSignOut} variant="ghost" className="w-full justify-start text-sidebar-foreground hover:bg-sidebar-accent/50 hover:text-sidebar-foreground">
             <LogOut className="h-4 w-4 mr-2" /> Cerrar sesión
           </Button>
@@ -126,6 +138,12 @@ export const AppLayout = () => {
                     </NavLink>
                   </DropdownMenuItem>
                 ))}
+                <DropdownMenuItem asChild>
+                  <NavLink to="/cuenta" className="flex items-center gap-2 cursor-pointer">
+                    <KeyRound className="h-4 w-4" />
+                    Mi cuenta
+                  </NavLink>
+                </DropdownMenuItem>
                 <DropdownMenuItem onClick={handleSignOut} className="cursor-pointer">
                   <LogOut className="h-4 w-4 mr-2" /> Cerrar sesión
                 </DropdownMenuItem>
