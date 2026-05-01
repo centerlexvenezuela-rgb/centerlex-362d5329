@@ -78,11 +78,6 @@ const Assistant = () => {
     toast.success("Copiado");
   };
 
-  const suggestions = [
-    "Redacta un modelo de demanda de cumplimiento de contrato",
-    "Explícame los requisitos del recurso de apelación",
-    "Dame una cláusula de confidencialidad para un contrato laboral",
-  ];
 
   return (
     <div className="space-y-4 h-[calc(100vh-10rem)] md:h-[calc(100vh-6rem)] flex flex-col">
@@ -104,14 +99,7 @@ const Assistant = () => {
             <div className="h-full flex flex-col items-center justify-center text-center max-w-xl mx-auto">
               <Sparkles className="h-12 w-12 text-accent mb-4" />
               <h2 className="font-serif text-2xl mb-2">¿En qué puedo ayudarle hoy?</h2>
-              <p className="text-muted-foreground mb-6">Pregúnteme sobre redacción de escritos, doctrina, jurisprudencia o procedimientos.</p>
-              <div className="grid gap-2 w-full">
-                {suggestions.map(s => (
-                  <button key={s} onClick={() => setInput(s)} className="text-left text-sm p-3 rounded border border-border hover:border-accent hover:bg-accent/5 transition">
-                    {s}
-                  </button>
-                ))}
-              </div>
+              <p className="text-muted-foreground">Escriba su consulta jurídica para comenzar.</p>
             </div>
           ) : (
             messages.map((m, i) => (

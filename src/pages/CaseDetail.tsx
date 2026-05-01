@@ -10,7 +10,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "
 import { Badge } from "@/components/ui/badge";
 import { ArrowLeft, Plus, FileText, Trash2, Edit, Copy, FileDown, Save } from "lucide-react";
 import { RichTextEditor } from "@/components/RichTextEditor";
-import { exportToPDF, exportToDocx, copyHtmlAsText } from "@/lib/exportDocs";
+import { exportToDocx, copyHtmlAsText } from "@/lib/exportDocs";
 import { toast } from "sonner";
 import { format, parseISO } from "date-fns";
 import { es } from "date-fns/locale";
@@ -136,7 +136,6 @@ const CaseDetail = () => {
                     <div className="flex gap-1 flex-wrap">
                       <Button size="sm" variant="ghost" onClick={() => openEditDoc(d)}><Edit className="h-4 w-4 mr-1" />Editar</Button>
                       <Button size="sm" variant="ghost" onClick={() => copyDoc(d)}><Copy className="h-4 w-4 mr-1" />Copiar</Button>
-                      <Button size="sm" variant="ghost" onClick={() => exportToPDF(d.title, d.content)}><FileDown className="h-4 w-4 mr-1" />PDF</Button>
                       <Button size="sm" variant="ghost" onClick={() => exportToDocx(d.title, d.content)}><FileDown className="h-4 w-4 mr-1" />Word</Button>
                       <Button size="icon" variant="ghost" onClick={() => removeDoc(d.id)} className="text-destructive"><Trash2 className="h-4 w-4" /></Button>
                     </div>
