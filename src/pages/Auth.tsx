@@ -34,7 +34,7 @@ const Auth = () => {
 
     if (roleData?.role === "lawyer") {
       toast.success("Sesión iniciada");
-      navigate("/");
+      navigate("/app");
     } else {
       await supabase.auth.signOut();
       toast.error("Esta cuenta no tiene acceso de abogado. Contacte al administrador.");

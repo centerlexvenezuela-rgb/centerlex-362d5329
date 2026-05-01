@@ -7,6 +7,7 @@ import { AuthProvider } from "@/hooks/useAuth";
 import { BrandingProvider } from "@/hooks/useBranding";
 import { ProtectedRoute } from "@/components/ProtectedRoute";
 import { AppLayout } from "@/components/AppLayout";
+import Landing from "./pages/Landing";
 import Auth from "./pages/Auth";
 import AdminAuth from "./pages/AdminAuth";
 import AdminPanel from "./pages/AdminPanel";
@@ -31,6 +32,7 @@ const App = () => (
         <BrandingProvider>
         <AuthProvider>
           <Routes>
+            <Route path="/" element={<Landing />} />
             <Route path="/auth" element={<Auth />} />
             <Route path="/admin/login" element={<AdminAuth />} />
             <Route
@@ -42,7 +44,7 @@ const App = () => (
               }
             />
             <Route element={<ProtectedRoute requireRole="lawyer"><AppLayout /></ProtectedRoute>}>
-              <Route path="/" element={<Dashboard />} />
+              <Route path="/app" element={<Dashboard />} />
               <Route path="/clientes" element={<Clients />} />
               <Route path="/agenda" element={<Agenda />} />
               <Route path="/expedientes" element={<Cases />} />
