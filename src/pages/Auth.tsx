@@ -53,12 +53,16 @@ const Auth = () => {
         />
         <div className="relative">
           <div className="flex items-center gap-3">
-            <div className="h-12 w-12 rounded bg-gradient-gold flex items-center justify-center shadow-gold">
-              <Scale className="h-6 w-6 text-primary" />
+            <div className="h-12 w-12 rounded bg-gradient-gold flex items-center justify-center shadow-gold overflow-hidden">
+              {branding.logo_url ? (
+                <img src={branding.logo_url} alt={branding.app_title} className="h-full w-full object-cover" />
+              ) : (
+                <Scale className="h-6 w-6 text-primary" />
+              )}
             </div>
             <div>
-              <h1 className="font-serif text-3xl">Lex Office</h1>
-              <p className="text-sm text-primary-foreground/70">Administración Jurídica</p>
+              <h1 className="font-serif text-3xl">{branding.app_title}</h1>
+              <p className="text-sm text-primary-foreground/70">{branding.app_subtitle}</p>
             </div>
           </div>
         </div>
