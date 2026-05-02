@@ -63,14 +63,21 @@ Deno.serve(async (req) => {
       });
       if (error) throw error;
       const { data: roles } = await admin.from("user_roles").select("user_id, role");
+      const { data: profiles } = await admin
+        .from("profiles")
+        .select("user_id, first_name, last_name, ai_enabled");
       const lawyers = list.users
         .map((u) => {
           const r = roles?.find((x) => x.user_id === u.id);
+          const p = profiles?.find((x) => x.user_id === u.id);
           return {
             id: u.id,
             email: u.email,
             created_at: u.created_at,
             role: r?.role ?? null,
+            first_name: p?.first_name ?? null,
+            last_name: p?.last_name ?? null,
+            ai_enabled: p?.ai_enabled ?? false,
           };
         })
         .filter((u) => u.role === "lawyer");
@@ -80,7 +87,7 @@ Deno.serve(async (req) => {
     }
 
     if (action === "create") {
-      const { email, password } = body;
+      const { email, password, first_name, last_name } = body;
       if (!email || !password || password.length < 6) {
         return new Response(
           JSON.stringify({ error: "Email y contraseña (mín. 6) requeridos" }),
@@ -100,7 +107,48 @@ Deno.serve(async (req) => {
         await admin.auth.admin.deleteUser(created.user.id);
         throw roleErr;
       }
+      const { error: profErr } = await admin.from("profiles").insert({
+        user_id: created.user.id,
+        first_name: first_name ?? null,
+        last_name: last_name ?? null,
+        ai_enabled: false,
+      });
+      if (profErr) {
+        await admin.auth.admin.deleteUser(created.user.id);
+        throw profErr;
+      }
       return new Response(JSON.stringify({ user: created.user }), {
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
+    if (action === "toggle_ai") {
+      const { user_id, ai_enabled } = body;
+      if (!user_id || typeof ai_enabled !== "boolean") {
+        return new Response(JSON.stringify({ error: "Parámetros inválidos" }), {
+          status: 400,
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      }
+      // Upsert profile row
+      const { data: existing } = await admin
+        .from("profiles")
+        .select("id")
+        .eq("user_id", user_id)
+        .maybeSingle();
+      if (existing) {
+        const { error } = await admin
+          .from("profiles")
+          .update({ ai_enabled })
+          .eq("user_id", user_id);
+        if (error) throw error;
+      } else {
+        const { error } = await admin
+          .from("profiles")
+          .insert({ user_id, ai_enabled });
+        if (error) throw error;
+      }
+      return new Response(JSON.stringify({ ok: true }), {
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
