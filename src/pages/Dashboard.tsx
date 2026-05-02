@@ -1,11 +1,15 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
+import { useProfile } from "@/hooks/useProfile";
+import { useAuth } from "@/hooks/useAuth";
 import { Card } from "@/components/ui/card";
 import { Users, Calendar, FolderOpen, MessageSquare, ArrowRight } from "lucide-react";
 
 const Dashboard = () => {
   const [stats, setStats] = useState({ clients: 0, cases: 0, today: 0 });
+  const { profile } = useProfile();
+  const { user } = useAuth();
 
   useEffect(() => {
     const load = async () => {
@@ -23,17 +27,23 @@ const Dashboard = () => {
     load();
   }, []);
 
-  const cards = [
+  const fullName = [profile?.first_name, profile?.last_name].filter(Boolean).join(" ").trim();
+  const greeting = fullName || user?.email || "Bienvenido";
+
+  const baseCards = [
     { to: "/clientes", title: "Clientes", icon: Users, desc: "Registro y gestión", value: stats.clients },
     { to: "/agenda", title: "Citas hoy", icon: Calendar, desc: "Calendario de audiencias", value: stats.today },
     { to: "/expedientes", title: "Expedientes", icon: FolderOpen, desc: "Casos y escritos", value: stats.cases },
-    { to: "/asistente", title: "Asistente IA", icon: MessageSquare, desc: "Consulta jurídica", value: "—" as any },
   ];
+  const cards = profile?.ai_enabled
+    ? [...baseCards, { to: "/asistente", title: "Asistente IA", icon: MessageSquare, desc: "Consulta jurídica", value: "—" as any }]
+    : baseCards;
 
   return (
     <div className="space-y-8">
       <div className="border-b border-border pb-6">
-        <h1 className="font-serif text-4xl mb-2">Despacho</h1>
+        <p className="text-sm text-muted-foreground">Bienvenido</p>
+        <h1 className="font-serif text-4xl mb-2">{greeting}</h1>
         <p className="text-muted-foreground">Vista general de su oficina jurídica</p>
       </div>
 
@@ -53,17 +63,19 @@ const Dashboard = () => {
         ))}
       </div>
 
-      <Card className="p-8 bg-gradient-hero text-primary-foreground shadow-elegant">
-        <div className="max-w-2xl">
-          <h2 className="font-serif text-3xl mb-3">Asistente jurídico inteligente</h2>
-          <p className="text-primary-foreground/80 mb-6">
-            Redacte escritos, consulte doctrina y resuelva dudas legales con la ayuda de inteligencia artificial integrada.
-          </p>
-          <Link to="/asistente" className="inline-flex items-center gap-2 bg-gradient-gold text-primary px-6 py-3 rounded font-medium shadow-gold hover:opacity-90 transition">
-            Abrir asistente <ArrowRight className="h-4 w-4" />
-          </Link>
-        </div>
-      </Card>
+      {profile?.ai_enabled && (
+        <Card className="p-8 bg-gradient-hero text-primary-foreground shadow-elegant">
+          <div className="max-w-2xl">
+            <h2 className="font-serif text-3xl mb-3">Asistente jurídico inteligente</h2>
+            <p className="text-primary-foreground/80 mb-6">
+              Redacte escritos, consulte doctrina y resuelva dudas legales con la ayuda de inteligencia artificial integrada.
+            </p>
+            <Link to="/asistente" className="inline-flex items-center gap-2 bg-gradient-gold text-primary px-6 py-3 rounded font-medium shadow-gold hover:opacity-90 transition">
+              Abrir asistente <ArrowRight className="h-4 w-4" />
+            </Link>
+          </div>
+        </Card>
+      )}
     </div>
   );
 };

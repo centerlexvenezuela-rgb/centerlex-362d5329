@@ -1,19 +1,26 @@
 import { useState, useRef, useEffect } from "react";
+import { Navigate } from "react-router-dom";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Send, Sparkles, Copy, User, Bot } from "lucide-react";
 import { toast } from "sonner";
+import { useProfile } from "@/hooks/useProfile";
 
 interface Msg { role: "user" | "assistant"; content: string; }
 
 const Assistant = () => {
+  const { profile, loading: profileLoading } = useProfile();
   const [messages, setMessages] = useState<Msg[]>([]);
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => { scrollRef.current?.scrollTo({ top: scrollRef.current.scrollHeight, behavior: "smooth" }); }, [messages]);
+
+  if (!profileLoading && !profile?.ai_enabled) {
+    return <Navigate to="/app" replace />;
+  }
 
   const send = async () => {
     const text = input.trim();

@@ -1,4 +1,6 @@
 // Edge function: Asistente jurídico con streaming via Lovable AI
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2.74.0";
+
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
@@ -26,6 +28,28 @@ Deno.serve(async (req: Request) => {
     const { messages } = await req.json();
     if (!Array.isArray(messages)) {
       return new Response(JSON.stringify({ error: "messages debe ser un arreglo" }), { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } });
+    }
+
+    // Verify user is authenticated and has AI enabled
+    const SUPABASE_URL = Deno.env.get("SUPABASE_URL")!;
+    const ANON = Deno.env.get("SUPABASE_ANON_KEY")!;
+    const SERVICE_ROLE = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
+    const authHeader = req.headers.get("Authorization") ?? "";
+    const userClient = createClient(SUPABASE_URL, ANON, {
+      global: { headers: { Authorization: authHeader } },
+    });
+    const { data: userData, error: userErr } = await userClient.auth.getUser();
+    if (userErr || !userData.user) {
+      return new Response(JSON.stringify({ error: "No autorizado" }), { status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" } });
+    }
+    const adminClient = createClient(SUPABASE_URL, SERVICE_ROLE);
+    const { data: profile } = await adminClient
+      .from("profiles")
+      .select("ai_enabled")
+      .eq("user_id", userData.user.id)
+      .maybeSingle();
+    if (!profile?.ai_enabled) {
+      return new Response(JSON.stringify({ error: "El asistente IA no está habilitado para su cuenta. Contacte al administrador." }), { status: 403, headers: { ...corsHeaders, "Content-Type": "application/json" } });
     }
 
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");

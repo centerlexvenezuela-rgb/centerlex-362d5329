@@ -2,6 +2,7 @@ import { NavLink, Outlet, useNavigate } from "react-router-dom";
 import { Scale, Users, Calendar, FolderOpen, Search, MessageSquare, LogOut, Menu, KeyRound } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { useBranding } from "@/hooks/useBranding";
+import { useProfile } from "@/hooks/useProfile";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -11,14 +12,15 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { cn } from "@/lib/utils";
 
-const nav = [
+type NavItem = { to: string; label: string; icon: typeof Scale; end?: boolean };
+const baseNav: NavItem[] = [
   { to: "/app", label: "Inicio", icon: Scale, end: true },
   { to: "/clientes", label: "Clientes", icon: Users },
   { to: "/agenda", label: "Agenda", icon: Calendar },
   { to: "/expedientes", label: "Expedientes", icon: FolderOpen },
   { to: "/buscar", label: "Búsqueda", icon: Search },
-  { to: "/asistente", label: "Asistente IA", icon: MessageSquare },
 ];
+const aiNav: NavItem = { to: "/asistente", label: "Asistente IA", icon: MessageSquare };
 
 // Mobile: visible directly in the bar
 const mobilePrimary = [
@@ -26,12 +28,14 @@ const mobilePrimary = [
   { to: "/buscar", label: "Búsqueda", icon: Search },
 ];
 const mobilePrimaryPaths = mobilePrimary.map((n) => n.to);
-const mobileSecondary = nav.filter((n) => !mobilePrimaryPaths.includes(n.to));
 
 export const AppLayout = () => {
   const { user, signOut } = useAuth();
   const { branding } = useBranding();
+  const { profile } = useProfile();
   const navigate = useNavigate();
+  const nav = profile?.ai_enabled ? [...baseNav, aiNav] : baseNav;
+  const mobileSecondary = nav.filter((n) => !mobilePrimaryPaths.includes(n.to));
 
   const handleSignOut = async () => {
     await signOut();
