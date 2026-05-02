@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card } from "@/components/ui/card";
+import { Switch } from "@/components/ui/switch";
 import {
   Table, TableBody, TableCell, TableHead, TableHeader, TableRow,
 } from "@/components/ui/table";
@@ -14,7 +15,7 @@ import {
   AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
-import { ShieldCheck, UserPlus, Trash2, LogOut, Loader2 } from "lucide-react";
+import { ShieldCheck, UserPlus, Trash2, LogOut, Loader2, Sparkles } from "lucide-react";
 import { BrandingSection } from "@/components/BrandingSection";
 import { ContactMessagesSection } from "@/components/ContactMessagesSection";
 import { ChangePasswordSection } from "@/components/ChangePasswordSection";
@@ -25,6 +26,9 @@ interface Lawyer {
   email: string;
   created_at: string;
   role: string | null;
+  first_name: string | null;
+  last_name: string | null;
+  ai_enabled: boolean;
 }
 
 const AdminPanel = () => {
@@ -33,8 +37,11 @@ const AdminPanel = () => {
   const [lawyers, setLawyers] = useState<Lawyer[]>([]);
   const [loading, setLoading] = useState(true);
   const [creating, setCreating] = useState(false);
+  const [togglingId, setTogglingId] = useState<string | null>(null);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [firstName, setFirstName] = useState("");
+  const [lastName, setLastName] = useState("");
 
   const load = async () => {
     setLoading(true);
@@ -52,14 +59,20 @@ const AdminPanel = () => {
     e.preventDefault();
     setCreating(true);
     const { data, error } = await supabase.functions.invoke("admin-users", {
-      body: { action: "create", email, password },
+      body: {
+        action: "create",
+        email,
+        password,
+        first_name: firstName.trim() || null,
+        last_name: lastName.trim() || null,
+      },
     });
     setCreating(false);
     if (error || data?.error) {
       return toast.error(error?.message ?? data?.error ?? "Error");
     }
     toast.success(`Cuenta creada para ${email}`);
-    setEmail(""); setPassword("");
+    setEmail(""); setPassword(""); setFirstName(""); setLastName("");
     load();
   };
 
@@ -72,6 +85,22 @@ const AdminPanel = () => {
     }
     toast.success(`Cuenta eliminada: ${email}`);
     load();
+  };
+
+  const handleToggleAI = async (id: string, next: boolean) => {
+    setTogglingId(id);
+    // Optimistic update
+    setLawyers((prev) => prev.map((l) => (l.id === id ? { ...l, ai_enabled: next } : l)));
+    const { data, error } = await supabase.functions.invoke("admin-users", {
+      body: { action: "toggle_ai", user_id: id, ai_enabled: next },
+    });
+    setTogglingId(null);
+    if (error || data?.error) {
+      // revert
+      setLawyers((prev) => prev.map((l) => (l.id === id ? { ...l, ai_enabled: !next } : l)));
+      return toast.error(error?.message ?? data?.error ?? "Error");
+    }
+    toast.success(next ? "Asistente IA habilitado" : "Asistente IA deshabilitado");
   };
 
   const handleSignOut = async () => {
@@ -109,7 +138,23 @@ const AdminPanel = () => {
             <UserPlus className="h-5 w-5 text-accent" />
             <h2 className="font-serif text-xl">Crear cuenta de abogado</h2>
           </div>
-          <form onSubmit={handleCreate} className="grid gap-4 md:grid-cols-[1fr_1fr_auto] items-end">
+          <form onSubmit={handleCreate} className="grid gap-4 md:grid-cols-2">
+            <div className="space-y-2">
+              <Label htmlFor="nf">Nombre</Label>
+              <Input
+                id="nf" type="text"
+                value={firstName} onChange={(e) => setFirstName(e.target.value)}
+                placeholder="Juan"
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="nl">Apellido</Label>
+              <Input
+                id="nl" type="text"
+                value={lastName} onChange={(e) => setLastName(e.target.value)}
+                placeholder="Pérez"
+              />
+            </div>
             <div className="space-y-2">
               <Label htmlFor="ne">Email</Label>
               <Input
@@ -126,9 +171,11 @@ const AdminPanel = () => {
                 placeholder="Mínimo 6 caracteres"
               />
             </div>
-            <Button type="submit" disabled={creating} className="bg-primary hover:bg-primary-glow">
-              {creating ? <Loader2 className="h-4 w-4 animate-spin" /> : "Crear cuenta"}
-            </Button>
+            <div className="md:col-span-2">
+              <Button type="submit" disabled={creating} className="bg-primary hover:bg-primary-glow">
+                {creating ? <Loader2 className="h-4 w-4 animate-spin" /> : "Crear cuenta"}
+              </Button>
+            </div>
           </form>
           <p className="text-xs text-muted-foreground mt-3">
             Comparta estas credenciales de forma segura con el abogado. Podrá cambiar su contraseña posteriormente.
@@ -147,53 +194,79 @@ const AdminPanel = () => {
               Aún no hay abogados registrados.
             </p>
           ) : (
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Email</TableHead>
-                  <TableHead>Fecha de creación</TableHead>
-                  <TableHead className="text-right">Acciones</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {lawyers.map((l) => (
-                  <TableRow key={l.id}>
-                    <TableCell className="font-medium">{l.email}</TableCell>
-                    <TableCell className="text-muted-foreground">
-                      {new Date(l.created_at).toLocaleDateString("es-ES")}
-                    </TableCell>
-                    <TableCell className="text-right">
-                      <AlertDialog>
-                        <AlertDialogTrigger asChild>
-                          <Button variant="ghost" size="sm" className="text-destructive hover:text-destructive">
-                            <Trash2 className="h-4 w-4" />
-                          </Button>
-                        </AlertDialogTrigger>
-                        <AlertDialogContent>
-                          <AlertDialogHeader>
-                            <AlertDialogTitle>¿Eliminar esta cuenta?</AlertDialogTitle>
-                            <AlertDialogDescription>
-                              Se eliminará permanentemente la cuenta de <strong>{l.email}</strong> y
-                              todos sus datos asociados (clientes, expedientes, citas y escritos).
-                              Esta acción no se puede deshacer.
-                            </AlertDialogDescription>
-                          </AlertDialogHeader>
-                          <AlertDialogFooter>
-                            <AlertDialogCancel>Cancelar</AlertDialogCancel>
-                            <AlertDialogAction
-                              onClick={() => handleDelete(l.id, l.email)}
-                              className="bg-destructive hover:bg-destructive/90"
-                            >
-                              Eliminar
-                            </AlertDialogAction>
-                          </AlertDialogFooter>
-                        </AlertDialogContent>
-                      </AlertDialog>
-                    </TableCell>
+            <div className="overflow-x-auto">
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Nombre</TableHead>
+                    <TableHead>Email</TableHead>
+                    <TableHead>Fecha</TableHead>
+                    <TableHead className="text-center">
+                      <span className="inline-flex items-center gap-1">
+                        <Sparkles className="h-3.5 w-3.5" /> Asistente IA
+                      </span>
+                    </TableHead>
+                    <TableHead className="text-right">Acciones</TableHead>
                   </TableRow>
-                ))}
-              </TableBody>
-            </Table>
+                </TableHeader>
+                <TableBody>
+                  {lawyers.map((l) => {
+                    const fullName = [l.first_name, l.last_name].filter(Boolean).join(" ").trim();
+                    return (
+                      <TableRow key={l.id}>
+                        <TableCell className="font-medium">
+                          {fullName || <span className="text-muted-foreground italic">Sin nombre</span>}
+                        </TableCell>
+                        <TableCell>{l.email}</TableCell>
+                        <TableCell className="text-muted-foreground">
+                          {new Date(l.created_at).toLocaleDateString("es-ES")}
+                        </TableCell>
+                        <TableCell className="text-center">
+                          <div className="inline-flex items-center gap-2">
+                            <Switch
+                              checked={l.ai_enabled}
+                              disabled={togglingId === l.id}
+                              onCheckedChange={(v) => handleToggleAI(l.id, v)}
+                            />
+                            <span className="text-xs text-muted-foreground">
+                              {l.ai_enabled ? "Activa" : "Inactiva"}
+                            </span>
+                          </div>
+                        </TableCell>
+                        <TableCell className="text-right">
+                          <AlertDialog>
+                            <AlertDialogTrigger asChild>
+                              <Button variant="ghost" size="sm" className="text-destructive hover:text-destructive">
+                                <Trash2 className="h-4 w-4" />
+                              </Button>
+                            </AlertDialogTrigger>
+                            <AlertDialogContent>
+                              <AlertDialogHeader>
+                                <AlertDialogTitle>¿Eliminar esta cuenta?</AlertDialogTitle>
+                                <AlertDialogDescription>
+                                  Se eliminará permanentemente la cuenta de <strong>{l.email}</strong> y
+                                  todos sus datos asociados (clientes, expedientes, citas y escritos).
+                                  Esta acción no se puede deshacer.
+                                </AlertDialogDescription>
+                              </AlertDialogHeader>
+                              <AlertDialogFooter>
+                                <AlertDialogCancel>Cancelar</AlertDialogCancel>
+                                <AlertDialogAction
+                                  onClick={() => handleDelete(l.id, l.email)}
+                                  className="bg-destructive hover:bg-destructive/90"
+                                >
+                                  Eliminar
+                                </AlertDialogAction>
+                              </AlertDialogFooter>
+                            </AlertDialogContent>
+                          </AlertDialog>
+                        </TableCell>
+                      </TableRow>
+                    );
+                  })}
+                </TableBody>
+              </Table>
+            </div>
           )}
         </Card>
       </main>
