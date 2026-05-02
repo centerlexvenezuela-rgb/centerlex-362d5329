@@ -12,14 +12,15 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { cn } from "@/lib/utils";
 
-const baseNav = [
+type NavItem = { to: string; label: string; icon: typeof Scale; end?: boolean };
+const baseNav: NavItem[] = [
   { to: "/app", label: "Inicio", icon: Scale, end: true },
   { to: "/clientes", label: "Clientes", icon: Users },
   { to: "/agenda", label: "Agenda", icon: Calendar },
   { to: "/expedientes", label: "Expedientes", icon: FolderOpen },
   { to: "/buscar", label: "Búsqueda", icon: Search },
 ];
-const aiNav = { to: "/asistente", label: "Asistente IA", icon: MessageSquare };
+const aiNav: NavItem = { to: "/asistente", label: "Asistente IA", icon: MessageSquare };
 
 // Mobile: visible directly in the bar
 const mobilePrimary = [
