@@ -53,9 +53,9 @@ const Auth = () => {
         />
         <div className="relative">
           <div className="flex items-center gap-3">
-            <div className="h-12 w-12 rounded bg-gradient-gold flex items-center justify-center shadow-gold overflow-hidden">
+            <div className={`h-12 w-12 rounded flex items-center justify-center overflow-hidden ${branding.logo_url ? "" : "bg-gradient-gold shadow-gold"}`}>
               {branding.logo_url ? (
-                <img src={branding.logo_url} alt={branding.app_title} className="h-full w-full object-cover" />
+                <img src={branding.logo_url} alt={branding.app_title} className="h-full w-full object-contain" />
               ) : (
                 <Scale className="h-6 w-6 text-primary" />
               )}
@@ -86,9 +86,9 @@ const Auth = () => {
       <div className="flex items-center justify-center p-6">
         <Card className="w-full max-w-md p-8 shadow-elegant">
           <div className="lg:hidden flex items-center gap-3 mb-6">
-            <div className="h-10 w-10 rounded bg-gradient-gold flex items-center justify-center shadow-gold overflow-hidden">
+            <div className={`h-10 w-10 rounded flex items-center justify-center overflow-hidden ${branding.logo_url ? "" : "bg-gradient-gold shadow-gold"}`}>
               {branding.logo_url ? (
-                <img src={branding.logo_url} alt={branding.app_title} className="h-full w-full object-cover" />
+                <img src={branding.logo_url} alt={branding.app_title} className="h-full w-full object-contain" />
               ) : (
                 <Scale className="h-5 w-5 text-primary" />
               )}
