@@ -65,7 +65,7 @@ Deno.serve(async (req) => {
       const { data: roles } = await admin.from("user_roles").select("user_id, role");
       const { data: profiles } = await admin
         .from("profiles")
-        .select("user_id, first_name, last_name, ai_enabled");
+        .select("user_id, first_name, last_name, ai_enabled, fees_enabled");
       const lawyers = list.users
         .map((u) => {
           const r = roles?.find((x) => x.user_id === u.id);
@@ -78,6 +78,7 @@ Deno.serve(async (req) => {
             first_name: p?.first_name ?? null,
             last_name: p?.last_name ?? null,
             ai_enabled: p?.ai_enabled ?? false,
+            fees_enabled: p?.fees_enabled ?? false,
           };
         })
         .filter((u) => u.role === "lawyer");
