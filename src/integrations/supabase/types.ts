@@ -254,10 +254,109 @@ export type Database = {
           },
         ]
       }
+      fee_categories: {
+        Row: {
+          created_at: string
+          display_order: number
+          id: string
+          name: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          display_order?: number
+          id?: string
+          name: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          display_order?: number
+          id?: string
+          name?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      fee_items: {
+        Row: {
+          amount_usd: number
+          category_id: string
+          created_at: string
+          display_order: number
+          id: string
+          name: string
+          notes: string | null
+          updated_at: string
+        }
+        Insert: {
+          amount_usd?: number
+          category_id: string
+          created_at?: string
+          display_order?: number
+          id?: string
+          name: string
+          notes?: string | null
+          updated_at?: string
+        }
+        Update: {
+          amount_usd?: number
+          category_id?: string
+          created_at?: string
+          display_order?: number
+          id?: string
+          name?: string
+          notes?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "fee_items_category_id_fkey"
+            columns: ["category_id"]
+            isOneToOne: false
+            referencedRelation: "fee_categories"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      fee_percentage_tiers: {
+        Row: {
+          created_at: string
+          description: string | null
+          display_order: number
+          id: string
+          max_amount_usd: number | null
+          min_amount_usd: number
+          percentage: number
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          display_order?: number
+          id?: string
+          max_amount_usd?: number | null
+          min_amount_usd: number
+          percentage: number
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          display_order?: number
+          id?: string
+          max_amount_usd?: number | null
+          min_amount_usd?: number
+          percentage?: number
+          updated_at?: string
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           ai_enabled: boolean
           created_at: string
+          fees_enabled: boolean
           first_name: string | null
           id: string
           last_name: string | null
@@ -267,6 +366,7 @@ export type Database = {
         Insert: {
           ai_enabled?: boolean
           created_at?: string
+          fees_enabled?: boolean
           first_name?: string | null
           id?: string
           last_name?: string | null
@@ -276,6 +376,7 @@ export type Database = {
         Update: {
           ai_enabled?: boolean
           created_at?: string
+          fees_enabled?: boolean
           first_name?: string | null
           id?: string
           last_name?: string | null
