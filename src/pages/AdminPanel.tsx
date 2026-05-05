@@ -91,18 +91,30 @@ const AdminPanel = () => {
 
   const handleToggleAI = async (id: string, next: boolean) => {
     setTogglingId(id);
-    // Optimistic update
     setLawyers((prev) => prev.map((l) => (l.id === id ? { ...l, ai_enabled: next } : l)));
     const { data, error } = await supabase.functions.invoke("admin-users", {
       body: { action: "toggle_ai", user_id: id, ai_enabled: next },
     });
     setTogglingId(null);
     if (error || data?.error) {
-      // revert
       setLawyers((prev) => prev.map((l) => (l.id === id ? { ...l, ai_enabled: !next } : l)));
       return toast.error(error?.message ?? data?.error ?? "Error");
     }
     toast.success(next ? "Asistente IA habilitado" : "Asistente IA deshabilitado");
+  };
+
+  const handleToggleFees = async (id: string, next: boolean) => {
+    setTogglingId(id);
+    setLawyers((prev) => prev.map((l) => (l.id === id ? { ...l, fees_enabled: next } : l)));
+    const { data, error } = await supabase.functions.invoke("admin-users", {
+      body: { action: "toggle_fees", user_id: id, fees_enabled: next },
+    });
+    setTogglingId(null);
+    if (error || data?.error) {
+      setLawyers((prev) => prev.map((l) => (l.id === id ? { ...l, fees_enabled: !next } : l)));
+      return toast.error(error?.message ?? data?.error ?? "Error");
+    }
+    toast.success(next ? "Calculadora de Honorarios habilitada" : "Calculadora de Honorarios deshabilitada");
   };
 
   const handleSignOut = async () => {
