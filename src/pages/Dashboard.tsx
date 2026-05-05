@@ -35,9 +35,15 @@ const Dashboard = () => {
     { to: "/agenda", title: "Citas hoy", icon: Calendar, desc: "Calendario de audiencias", value: stats.today },
     { to: "/expedientes", title: "Expedientes", icon: FolderOpen, desc: "Casos y escritos", value: stats.cases },
   ];
-  const cards = profile?.ai_enabled
-    ? [...baseCards, { to: "/asistente", title: "Asistente IA", icon: MessageSquare, desc: "Consulta jurídica", value: "—" as any }]
-    : baseCards;
+  const cards = [
+    ...baseCards,
+    ...(profile?.fees_enabled
+      ? [{ to: "/honorarios", title: "Honorarios", icon: Calculator, desc: "Tarifas mínimas FCAV", value: "—" as any }]
+      : []),
+    ...(profile?.ai_enabled
+      ? [{ to: "/asistente", title: "Asistente IA", icon: MessageSquare, desc: "Consulta jurídica", value: "—" as any }]
+      : []),
+  ];
 
   return (
     <div className="space-y-8">
