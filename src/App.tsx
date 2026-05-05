@@ -19,6 +19,7 @@ import CaseDetail from "./pages/CaseDetail";
 import SearchPage from "./pages/SearchPage";
 import Assistant from "./pages/Assistant";
 import Settings from "./pages/Settings";
+import Fees from "./pages/Fees";
 import NotFound from "./pages/NotFound.tsx";
 
 const queryClient = new QueryClient();
