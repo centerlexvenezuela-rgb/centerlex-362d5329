@@ -4,7 +4,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useProfile } from "@/hooks/useProfile";
 import { useAuth } from "@/hooks/useAuth";
 import { Card } from "@/components/ui/card";
-import { Users, Calendar, FolderOpen, MessageSquare, ArrowRight } from "lucide-react";
+import { Users, Calendar, FolderOpen, MessageSquare, ArrowRight, Calculator } from "lucide-react";
 
 const Dashboard = () => {
   const [stats, setStats] = useState({ clients: 0, cases: 0, today: 0 });
