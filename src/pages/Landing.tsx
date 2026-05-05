@@ -62,9 +62,9 @@ const Landing = () => {
       <header className="border-b bg-card/80 backdrop-blur sticky top-0 z-50">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 py-3 flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className="h-10 w-10 rounded bg-gradient-gold flex items-center justify-center shadow-gold overflow-hidden">
+            <div className={`h-10 w-10 rounded flex items-center justify-center overflow-hidden ${branding.logo_url ? "" : "bg-gradient-gold shadow-gold"}`}>
               {branding.logo_url ? (
-                <img src={branding.logo_url} alt={branding.app_title} className="h-full w-full object-cover" />
+                <img src={branding.logo_url} alt={branding.app_title} className="h-full w-full object-contain" />
               ) : (
                 <Scale className="h-5 w-5 text-primary" />
               )}
@@ -85,9 +85,9 @@ const Landing = () => {
       {/* Hero */}
       <section className="max-w-6xl mx-auto px-4 sm:px-6 py-12 sm:py-20">
         <div className="text-center max-w-3xl mx-auto">
-          <div className="mx-auto mb-6 h-20 w-20 sm:h-24 sm:w-24 rounded-2xl bg-gradient-gold flex items-center justify-center shadow-gold overflow-hidden">
+          <div className={`mx-auto mb-6 h-20 w-20 sm:h-24 sm:w-24 rounded-2xl flex items-center justify-center overflow-hidden ${branding.logo_url ? "" : "bg-gradient-gold shadow-gold"}`}>
             {branding.logo_url ? (
-              <img src={branding.logo_url} alt={branding.app_title} className="h-full w-full object-cover" />
+              <img src={branding.logo_url} alt={branding.app_title} className="h-full w-full object-contain" />
             ) : (
               <Scale className="h-10 w-10 sm:h-12 sm:w-12 text-primary" />
             )}
