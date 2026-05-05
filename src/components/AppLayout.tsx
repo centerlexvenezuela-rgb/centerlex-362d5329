@@ -35,7 +35,11 @@ export const AppLayout = () => {
   const { branding } = useBranding();
   const { profile } = useProfile();
   const navigate = useNavigate();
-  const nav = profile?.ai_enabled ? [...baseNav, aiNav] : baseNav;
+  const nav = [
+    ...baseNav,
+    ...(profile?.fees_enabled ? [feesNav] : []),
+    ...(profile?.ai_enabled ? [aiNav] : []),
+  ];
   const mobileSecondary = nav.filter((n) => !mobilePrimaryPaths.includes(n.to));
 
   const handleSignOut = async () => {
