@@ -30,6 +30,7 @@ interface Lawyer {
   first_name: string | null;
   last_name: string | null;
   ai_enabled: boolean;
+  fees_enabled: boolean;
 }
 
 const AdminPanel = () => {
