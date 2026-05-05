@@ -220,6 +220,11 @@ const AdminPanel = () => {
                         <Sparkles className="h-3.5 w-3.5" /> Asistente IA
                       </span>
                     </TableHead>
+                    <TableHead className="text-center">
+                      <span className="inline-flex items-center gap-1">
+                        <Calculator className="h-3.5 w-3.5" /> Honorarios
+                      </span>
+                    </TableHead>
                     <TableHead className="text-right">Acciones</TableHead>
                   </TableRow>
                 </TableHeader>
@@ -244,6 +249,18 @@ const AdminPanel = () => {
                             />
                             <span className="text-xs text-muted-foreground">
                               {l.ai_enabled ? "Activa" : "Inactiva"}
+                            </span>
+                          </div>
+                        </TableCell>
+                        <TableCell className="text-center">
+                          <div className="inline-flex items-center gap-2">
+                            <Switch
+                              checked={l.fees_enabled}
+                              disabled={togglingId === l.id}
+                              onCheckedChange={(v) => handleToggleFees(l.id, v)}
+                            />
+                            <span className="text-xs text-muted-foreground">
+                              {l.fees_enabled ? "Activa" : "Inactiva"}
                             </span>
                           </div>
                         </TableCell>
