@@ -1,5 +1,5 @@
 import { NavLink, Outlet, useNavigate } from "react-router-dom";
-import { Scale, Users, Calendar, FolderOpen, Search, MessageSquare, LogOut, Menu, KeyRound } from "lucide-react";
+import { Scale, Users, Calendar, FolderOpen, Search, MessageSquare, LogOut, Menu, KeyRound, Calculator } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { useBranding } from "@/hooks/useBranding";
 import { useProfile } from "@/hooks/useProfile";
@@ -21,6 +21,7 @@ const baseNav: NavItem[] = [
   { to: "/buscar", label: "Búsqueda", icon: Search },
 ];
 const aiNav: NavItem = { to: "/asistente", label: "Asistente IA", icon: MessageSquare };
+const feesNav: NavItem = { to: "/honorarios", label: "Honorarios", icon: Calculator };
 
 // Mobile: visible directly in the bar
 const mobilePrimary = [
@@ -34,7 +35,11 @@ export const AppLayout = () => {
   const { branding } = useBranding();
   const { profile } = useProfile();
   const navigate = useNavigate();
-  const nav = profile?.ai_enabled ? [...baseNav, aiNav] : baseNav;
+  const nav = [
+    ...baseNav,
+    ...(profile?.fees_enabled ? [feesNav] : []),
+    ...(profile?.ai_enabled ? [aiNav] : []),
+  ];
   const mobileSecondary = nav.filter((n) => !mobilePrimaryPaths.includes(n.to));
 
   const handleSignOut = async () => {

@@ -4,7 +4,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useProfile } from "@/hooks/useProfile";
 import { useAuth } from "@/hooks/useAuth";
 import { Card } from "@/components/ui/card";
-import { Users, Calendar, FolderOpen, MessageSquare, ArrowRight } from "lucide-react";
+import { Users, Calendar, FolderOpen, MessageSquare, ArrowRight, Calculator } from "lucide-react";
 
 const Dashboard = () => {
   const [stats, setStats] = useState({ clients: 0, cases: 0, today: 0 });
@@ -35,9 +35,15 @@ const Dashboard = () => {
     { to: "/agenda", title: "Citas hoy", icon: Calendar, desc: "Calendario de audiencias", value: stats.today },
     { to: "/expedientes", title: "Expedientes", icon: FolderOpen, desc: "Casos y escritos", value: stats.cases },
   ];
-  const cards = profile?.ai_enabled
-    ? [...baseCards, { to: "/asistente", title: "Asistente IA", icon: MessageSquare, desc: "Consulta jurídica", value: "—" as any }]
-    : baseCards;
+  const cards = [
+    ...baseCards,
+    ...(profile?.fees_enabled
+      ? [{ to: "/honorarios", title: "Honorarios", icon: Calculator, desc: "Tarifas mínimas FCAV", value: "—" as any }]
+      : []),
+    ...(profile?.ai_enabled
+      ? [{ to: "/asistente", title: "Asistente IA", icon: MessageSquare, desc: "Consulta jurídica", value: "—" as any }]
+      : []),
+  ];
 
   return (
     <div className="space-y-8">

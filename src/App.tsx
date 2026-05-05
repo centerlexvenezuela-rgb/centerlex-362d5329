@@ -19,6 +19,7 @@ import CaseDetail from "./pages/CaseDetail";
 import SearchPage from "./pages/SearchPage";
 import Assistant from "./pages/Assistant";
 import Settings from "./pages/Settings";
+import Fees from "./pages/Fees";
 import NotFound from "./pages/NotFound.tsx";
 
 const queryClient = new QueryClient();
@@ -51,6 +52,7 @@ const App = () => (
               <Route path="/expedientes/:id" element={<CaseDetail />} />
               <Route path="/buscar" element={<SearchPage />} />
               <Route path="/asistente" element={<Assistant />} />
+              <Route path="/honorarios" element={<Fees />} />
               <Route path="/cuenta" element={<Settings />} />
             </Route>
             <Route path="*" element={<NotFound />} />

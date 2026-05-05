@@ -65,7 +65,7 @@ Deno.serve(async (req) => {
       const { data: roles } = await admin.from("user_roles").select("user_id, role");
       const { data: profiles } = await admin
         .from("profiles")
-        .select("user_id, first_name, last_name, ai_enabled");
+        .select("user_id, first_name, last_name, ai_enabled, fees_enabled");
       const lawyers = list.users
         .map((u) => {
           const r = roles?.find((x) => x.user_id === u.id);
@@ -78,6 +78,7 @@ Deno.serve(async (req) => {
             first_name: p?.first_name ?? null,
             last_name: p?.last_name ?? null,
             ai_enabled: p?.ai_enabled ?? false,
+            fees_enabled: p?.fees_enabled ?? false,
           };
         })
         .filter((u) => u.role === "lawyer");
@@ -122,15 +123,16 @@ Deno.serve(async (req) => {
       });
     }
 
-    if (action === "toggle_ai") {
-      const { user_id, ai_enabled } = body;
-      if (!user_id || typeof ai_enabled !== "boolean") {
+    if (action === "toggle_ai" || action === "toggle_fees") {
+      const { user_id } = body;
+      const field = action === "toggle_ai" ? "ai_enabled" : "fees_enabled";
+      const value = action === "toggle_ai" ? body.ai_enabled : body.fees_enabled;
+      if (!user_id || typeof value !== "boolean") {
         return new Response(JSON.stringify({ error: "Parámetros inválidos" }), {
           status: 400,
           headers: { ...corsHeaders, "Content-Type": "application/json" },
         });
       }
-      // Upsert profile row
       const { data: existing } = await admin
         .from("profiles")
         .select("id")
@@ -139,13 +141,13 @@ Deno.serve(async (req) => {
       if (existing) {
         const { error } = await admin
           .from("profiles")
-          .update({ ai_enabled })
+          .update({ [field]: value })
           .eq("user_id", user_id);
         if (error) throw error;
       } else {
         const { error } = await admin
           .from("profiles")
-          .insert({ user_id, ai_enabled });
+          .insert({ user_id, [field]: value });
         if (error) throw error;
       }
       return new Response(JSON.stringify({ ok: true }), {

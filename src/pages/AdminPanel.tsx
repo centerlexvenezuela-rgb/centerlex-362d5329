@@ -15,10 +15,11 @@ import {
   AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
-import { ShieldCheck, UserPlus, Trash2, LogOut, Loader2, Sparkles } from "lucide-react";
+import { ShieldCheck, UserPlus, Trash2, LogOut, Loader2, Sparkles, Calculator } from "lucide-react";
 import { BrandingSection } from "@/components/BrandingSection";
 import { ContactMessagesSection } from "@/components/ContactMessagesSection";
 import { ChangePasswordSection } from "@/components/ChangePasswordSection";
+import { FeesAdminSection } from "@/components/FeesAdminSection";
 import { toast } from "sonner";
 
 interface Lawyer {
@@ -29,6 +30,7 @@ interface Lawyer {
   first_name: string | null;
   last_name: string | null;
   ai_enabled: boolean;
+  fees_enabled: boolean;
 }
 
 const AdminPanel = () => {
@@ -89,18 +91,30 @@ const AdminPanel = () => {
 
   const handleToggleAI = async (id: string, next: boolean) => {
     setTogglingId(id);
-    // Optimistic update
     setLawyers((prev) => prev.map((l) => (l.id === id ? { ...l, ai_enabled: next } : l)));
     const { data, error } = await supabase.functions.invoke("admin-users", {
       body: { action: "toggle_ai", user_id: id, ai_enabled: next },
     });
     setTogglingId(null);
     if (error || data?.error) {
-      // revert
       setLawyers((prev) => prev.map((l) => (l.id === id ? { ...l, ai_enabled: !next } : l)));
       return toast.error(error?.message ?? data?.error ?? "Error");
     }
     toast.success(next ? "Asistente IA habilitado" : "Asistente IA deshabilitado");
+  };
+
+  const handleToggleFees = async (id: string, next: boolean) => {
+    setTogglingId(id);
+    setLawyers((prev) => prev.map((l) => (l.id === id ? { ...l, fees_enabled: next } : l)));
+    const { data, error } = await supabase.functions.invoke("admin-users", {
+      body: { action: "toggle_fees", user_id: id, fees_enabled: next },
+    });
+    setTogglingId(null);
+    if (error || data?.error) {
+      setLawyers((prev) => prev.map((l) => (l.id === id ? { ...l, fees_enabled: !next } : l)));
+      return toast.error(error?.message ?? data?.error ?? "Error");
+    }
+    toast.success(next ? "Calculadora de Honorarios habilitada" : "Calculadora de Honorarios deshabilitada");
   };
 
   const handleSignOut = async () => {
@@ -206,6 +220,11 @@ const AdminPanel = () => {
                         <Sparkles className="h-3.5 w-3.5" /> Asistente IA
                       </span>
                     </TableHead>
+                    <TableHead className="text-center">
+                      <span className="inline-flex items-center gap-1">
+                        <Calculator className="h-3.5 w-3.5" /> Honorarios
+                      </span>
+                    </TableHead>
                     <TableHead className="text-right">Acciones</TableHead>
                   </TableRow>
                 </TableHeader>
@@ -230,6 +249,18 @@ const AdminPanel = () => {
                             />
                             <span className="text-xs text-muted-foreground">
                               {l.ai_enabled ? "Activa" : "Inactiva"}
+                            </span>
+                          </div>
+                        </TableCell>
+                        <TableCell className="text-center">
+                          <div className="inline-flex items-center gap-2">
+                            <Switch
+                              checked={l.fees_enabled}
+                              disabled={togglingId === l.id}
+                              onCheckedChange={(v) => handleToggleFees(l.id, v)}
+                            />
+                            <span className="text-xs text-muted-foreground">
+                              {l.fees_enabled ? "Activa" : "Inactiva"}
                             </span>
                           </div>
                         </TableCell>
@@ -269,6 +300,8 @@ const AdminPanel = () => {
             </div>
           )}
         </Card>
+
+        <FeesAdminSection />
       </main>
     </div>
   );
