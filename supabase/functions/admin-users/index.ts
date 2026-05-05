@@ -123,15 +123,16 @@ Deno.serve(async (req) => {
       });
     }
 
-    if (action === "toggle_ai") {
-      const { user_id, ai_enabled } = body;
-      if (!user_id || typeof ai_enabled !== "boolean") {
+    if (action === "toggle_ai" || action === "toggle_fees") {
+      const { user_id } = body;
+      const field = action === "toggle_ai" ? "ai_enabled" : "fees_enabled";
+      const value = action === "toggle_ai" ? body.ai_enabled : body.fees_enabled;
+      if (!user_id || typeof value !== "boolean") {
         return new Response(JSON.stringify({ error: "Parámetros inválidos" }), {
           status: 400,
           headers: { ...corsHeaders, "Content-Type": "application/json" },
         });
       }
-      // Upsert profile row
       const { data: existing } = await admin
         .from("profiles")
         .select("id")
@@ -140,13 +141,13 @@ Deno.serve(async (req) => {
       if (existing) {
         const { error } = await admin
           .from("profiles")
-          .update({ ai_enabled })
+          .update({ [field]: value })
           .eq("user_id", user_id);
         if (error) throw error;
       } else {
         const { error } = await admin
           .from("profiles")
-          .insert({ user_id, ai_enabled });
+          .insert({ user_id, [field]: value });
         if (error) throw error;
       }
       return new Response(JSON.stringify({ ok: true }), {
