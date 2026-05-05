@@ -24,11 +24,11 @@ export const useProfile = () => {
       setLoading(true);
       const { data } = await supabase
         .from("profiles")
-        .select("first_name, last_name, ai_enabled")
+        .select("first_name, last_name, ai_enabled, fees_enabled")
         .eq("user_id", user.id)
         .maybeSingle();
       setProfile(
-        data ?? { first_name: null, last_name: null, ai_enabled: false }
+        data ?? { first_name: null, last_name: null, ai_enabled: false, fees_enabled: false }
       );
       setLoading(false);
     };
