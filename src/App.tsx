@@ -52,6 +52,7 @@ const App = () => (
               <Route path="/expedientes/:id" element={<CaseDetail />} />
               <Route path="/buscar" element={<SearchPage />} />
               <Route path="/asistente" element={<Assistant />} />
+              <Route path="/honorarios" element={<Fees />} />
               <Route path="/cuenta" element={<Settings />} />
             </Route>
             <Route path="*" element={<NotFound />} />
