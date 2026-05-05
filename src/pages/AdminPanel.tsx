@@ -300,6 +300,8 @@ const AdminPanel = () => {
             </div>
           )}
         </Card>
+
+        <FeesAdminSection />
       </main>
     </div>
   );
