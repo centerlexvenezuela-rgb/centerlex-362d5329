@@ -21,6 +21,7 @@ const baseNav: NavItem[] = [
   { to: "/buscar", label: "Búsqueda", icon: Search },
 ];
 const aiNav: NavItem = { to: "/asistente", label: "Asistente IA", icon: MessageSquare };
+const feesNav: NavItem = { to: "/honorarios", label: "Honorarios", icon: Calculator };
 
 // Mobile: visible directly in the bar
 const mobilePrimary = [
