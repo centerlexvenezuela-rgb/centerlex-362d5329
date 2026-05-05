@@ -1,5 +1,5 @@
 import { NavLink, Outlet, useNavigate } from "react-router-dom";
-import { Scale, Users, Calendar, FolderOpen, Search, MessageSquare, LogOut, Menu, KeyRound } from "lucide-react";
+import { Scale, Users, Calendar, FolderOpen, Search, MessageSquare, LogOut, Menu, KeyRound, Calculator } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { useBranding } from "@/hooks/useBranding";
 import { useProfile } from "@/hooks/useProfile";
