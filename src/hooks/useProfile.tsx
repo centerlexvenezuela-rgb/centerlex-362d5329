@@ -6,6 +6,7 @@ export interface LawyerProfile {
   first_name: string | null;
   last_name: string | null;
   ai_enabled: boolean;
+  fees_enabled: boolean;
 }
 
 export const useProfile = () => {
