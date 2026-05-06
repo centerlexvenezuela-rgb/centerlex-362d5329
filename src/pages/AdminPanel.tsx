@@ -20,6 +20,7 @@ import { BrandingSection } from "@/components/BrandingSection";
 import { ContactMessagesSection } from "@/components/ContactMessagesSection";
 import { ChangePasswordSection } from "@/components/ChangePasswordSection";
 import { FeesAdminSection } from "@/components/FeesAdminSection";
+import { BackupSection } from "@/components/BackupSection";
 import { toast } from "sonner";
 
 interface Lawyer {
@@ -302,6 +303,8 @@ const AdminPanel = () => {
         </Card>
 
         <FeesAdminSection />
+
+        <BackupSection />
       </main>
     </div>
   );
