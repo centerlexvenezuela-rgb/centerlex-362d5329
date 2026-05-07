@@ -52,6 +52,7 @@ const setFavicon = (url: string | null) => {
 
 export const BrandingProvider = ({ children }: { children: ReactNode }) => {
   const [branding, setBranding] = useState<Branding>(defaults);
+  const [loading, setLoading] = useState(true);
 
   const refresh = async () => {
     const { data } = await supabase
@@ -60,6 +61,7 @@ export const BrandingProvider = ({ children }: { children: ReactNode }) => {
       .limit(1)
       .maybeSingle();
     if (data) setBranding({ ...defaults, ...data } as Branding);
+    setLoading(false);
   };
 
   useEffect(() => { refresh(); }, []);
@@ -74,7 +76,7 @@ export const BrandingProvider = ({ children }: { children: ReactNode }) => {
   }, [branding]);
 
   return (
-    <BrandingContext.Provider value={{ branding, refresh }}>
+    <BrandingContext.Provider value={{ branding, loading, refresh }}>
       {children}
     </BrandingContext.Provider>
   );
