@@ -32,6 +32,7 @@ const App = () => (
       <Sonner />
       <BrowserRouter>
         <BrandingProvider>
+        <BrandingGate>
         <AuthProvider>
           <Routes>
             <Route path="/" element={<Landing />} />
