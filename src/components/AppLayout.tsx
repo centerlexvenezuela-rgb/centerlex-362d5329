@@ -109,7 +109,7 @@ export const AppLayout = () => {
         <div className="flex items-center justify-between gap-2 px-3 py-2">
           <div className="flex items-center gap-2 min-w-0">
             {branding.logo_url ? (
-              <img src={branding.logo_url} alt="" className="h-6 w-6 rounded object-cover shrink-0" />
+              <img src={branding.logo_url} alt="" className="h-6 w-6 object-contain shrink-0" />
             ) : (
               <Scale className="h-5 w-5 text-accent shrink-0" />
             )}
