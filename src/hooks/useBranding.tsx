@@ -23,10 +23,11 @@ const defaults: Branding = {
 
 interface Ctx {
   branding: Branding;
+  loading: boolean;
   refresh: () => Promise<void>;
 }
 
-const BrandingContext = createContext<Ctx>({ branding: defaults, refresh: async () => {} });
+const BrandingContext = createContext<Ctx>({ branding: defaults, loading: true, refresh: async () => {} });
 
 const setMeta = (name: string, content: string, attr: "name" | "property" = "name") => {
   let el = document.head.querySelector<HTMLMetaElement>(`meta[${attr}="${name}"]`);
@@ -51,6 +52,7 @@ const setFavicon = (url: string | null) => {
 
 export const BrandingProvider = ({ children }: { children: ReactNode }) => {
   const [branding, setBranding] = useState<Branding>(defaults);
+  const [loading, setLoading] = useState(true);
 
   const refresh = async () => {
     const { data } = await supabase
@@ -59,6 +61,7 @@ export const BrandingProvider = ({ children }: { children: ReactNode }) => {
       .limit(1)
       .maybeSingle();
     if (data) setBranding({ ...defaults, ...data } as Branding);
+    setLoading(false);
   };
 
   useEffect(() => { refresh(); }, []);
@@ -73,7 +76,7 @@ export const BrandingProvider = ({ children }: { children: ReactNode }) => {
   }, [branding]);
 
   return (
-    <BrandingContext.Provider value={{ branding, refresh }}>
+    <BrandingContext.Provider value={{ branding, loading, refresh }}>
       {children}
     </BrandingContext.Provider>
   );

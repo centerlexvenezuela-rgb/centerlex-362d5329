@@ -53,9 +53,9 @@ export const AppLayout = () => {
       <aside className="hidden md:flex w-64 flex-col bg-sidebar text-sidebar-foreground border-r border-sidebar-border">
         <div className="px-6 py-6 border-b border-sidebar-border">
           <div className="flex items-center gap-3">
-            <div className="h-10 w-10 rounded bg-gradient-gold flex items-center justify-center shadow-gold overflow-hidden">
+            <div className={cn("h-10 w-10 rounded flex items-center justify-center overflow-hidden", branding.logo_url ? "bg-transparent" : "bg-gradient-gold shadow-gold")}>
               {branding.logo_url ? (
-                <img src={branding.logo_url} alt={branding.app_title} className="h-full w-full object-cover" />
+                <img src={branding.logo_url} alt={branding.app_title} className="h-full w-full object-contain" />
               ) : (
                 <Scale className="h-5 w-5 text-primary" />
               )}
@@ -109,7 +109,7 @@ export const AppLayout = () => {
         <div className="flex items-center justify-between gap-2 px-3 py-2">
           <div className="flex items-center gap-2 min-w-0">
             {branding.logo_url ? (
-              <img src={branding.logo_url} alt="" className="h-6 w-6 rounded object-cover shrink-0" />
+              <img src={branding.logo_url} alt="" className="h-6 w-6 object-contain shrink-0" />
             ) : (
               <Scale className="h-5 w-5 text-accent shrink-0" />
             )}

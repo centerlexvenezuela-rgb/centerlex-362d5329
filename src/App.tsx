@@ -5,6 +5,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { AuthProvider } from "@/hooks/useAuth";
 import { BrandingProvider } from "@/hooks/useBranding";
+import { BrandingGate } from "@/components/BrandingGate";
 import { ProtectedRoute } from "@/components/ProtectedRoute";
 import { AppLayout } from "@/components/AppLayout";
 import Landing from "./pages/Landing";
@@ -31,6 +32,7 @@ const App = () => (
       <Sonner />
       <BrowserRouter>
         <BrandingProvider>
+        <BrandingGate>
         <AuthProvider>
           <Routes>
             <Route path="/" element={<Landing />} />
@@ -58,6 +60,7 @@ const App = () => (
             <Route path="*" element={<NotFound />} />
           </Routes>
         </AuthProvider>
+        </BrandingGate>
         </BrandingProvider>
       </BrowserRouter>
     </TooltipProvider>
