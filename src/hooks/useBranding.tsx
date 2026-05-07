@@ -23,10 +23,11 @@ const defaults: Branding = {
 
 interface Ctx {
   branding: Branding;
+  loading: boolean;
   refresh: () => Promise<void>;
 }
 
-const BrandingContext = createContext<Ctx>({ branding: defaults, refresh: async () => {} });
+const BrandingContext = createContext<Ctx>({ branding: defaults, loading: true, refresh: async () => {} });
 
 const setMeta = (name: string, content: string, attr: "name" | "property" = "name") => {
   let el = document.head.querySelector<HTMLMetaElement>(`meta[${attr}="${name}"]`);
