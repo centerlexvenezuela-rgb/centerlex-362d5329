@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import { z } from "zod";
-import { useBranding } from "@/hooks/useBranding";
+import { useBranding, interpolate } from "@/hooks/useBranding";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -23,6 +23,14 @@ const contactSchema = z.object({
 
 const Landing = () => {
   const { branding } = useBranding();
+  const c = branding.landing_content;
+  const vars = {
+    app_title: branding.app_title,
+    app_subtitle: branding.app_subtitle,
+    year: new Date().getFullYear(),
+  };
+  const t = (s: string) => interpolate(s, vars);
+
   const [form, setForm] = useState({ first_name: "", last_name: "", email: "", message: "" });
   const [sending, setSending] = useState(false);
 
@@ -45,15 +53,15 @@ const Landing = () => {
     });
     setSending(false);
     if (error) return toast.error(error.message);
-    toast.success("Mensaje enviado. Nos pondremos en contacto pronto.");
+    toast.success(c.contact_success_message);
     setForm({ first_name: "", last_name: "", email: "", message: "" });
   };
 
   const features = [
-    { icon: Users, title: "Gestión de clientes", desc: "Toda la información de sus clientes centralizada y accesible." },
-    { icon: FileText, title: "Expedientes digitales", desc: "Organice cada caso con escritos, plazos y documentos." },
-    { icon: Clock, title: "Agenda inteligente", desc: "No vuelva a perder una audiencia o cita importante." },
-    { icon: Sparkles, title: "Asistente con IA", desc: "Redacte escritos y consulte normativa con apoyo de inteligencia artificial." },
+    { icon: Users, title: c.feature_1_title, desc: c.feature_1_desc },
+    { icon: FileText, title: c.feature_2_title, desc: c.feature_2_desc },
+    { icon: Clock, title: c.feature_3_title, desc: c.feature_3_desc },
+    { icon: Sparkles, title: c.feature_4_title, desc: c.feature_4_desc },
   ];
 
   return (
@@ -76,7 +84,7 @@ const Landing = () => {
           </div>
           <Button asChild variant="outline" size="sm">
             <Link to="/auth">
-              <LogIn className="h-4 w-4 mr-1.5" /> Ingresar
+              <LogIn className="h-4 w-4 mr-1.5" /> {c.header_login_button}
             </Link>
           </Button>
         </div>
@@ -93,26 +101,22 @@ const Landing = () => {
             )}
           </div>
           <h2 className="font-serif text-3xl sm:text-5xl leading-tight mb-4">
-            {branding.app_title}
+            {c.hero_title?.trim() ? t(c.hero_title) : branding.app_title}
           </h2>
           <p className="text-lg sm:text-xl text-accent font-medium mb-6">
-            {branding.app_subtitle}
+            {c.hero_subtitle?.trim() ? t(c.hero_subtitle) : branding.app_subtitle}
           </p>
-          <p className="text-base sm:text-lg text-muted-foreground leading-relaxed mb-8">
-            La plataforma todo-en-uno diseñada para abogados modernos. Centralice
-            clientes, expedientes, agenda y escritos en un solo lugar — con la
-            ayuda de un asistente jurídico de inteligencia artificial. Ahorre
-            horas de trabajo administrativo y dedique más tiempo a lo que
-            realmente importa: <strong className="text-foreground">defender a sus clientes</strong>.
+          <p className="text-base sm:text-lg text-muted-foreground leading-relaxed mb-8 whitespace-pre-line">
+            {t(c.hero_description)}
           </p>
           <div className="flex flex-col sm:flex-row gap-3 justify-center">
             <Button asChild size="lg" className="bg-primary hover:bg-primary-glow">
               <Link to="/auth">
-                <LogIn className="h-5 w-5 mr-2" /> Ingresar a la aplicación
+                <LogIn className="h-5 w-5 mr-2" /> {c.hero_cta_primary}
               </Link>
             </Button>
             <Button onClick={scrollToContact} size="lg" variant="outline">
-              <Send className="h-5 w-5 mr-2" /> Solicitar la aplicación
+              <Send className="h-5 w-5 mr-2" /> {c.hero_cta_secondary}
             </Button>
           </div>
         </div>
@@ -122,7 +126,7 @@ const Landing = () => {
       <section className="bg-muted/30 py-12 sm:py-16">
         <div className="max-w-6xl mx-auto px-4 sm:px-6">
           <h3 className="font-serif text-2xl sm:text-3xl text-center mb-10">
-            Todo lo que su despacho necesita
+            {t(c.features_title)}
           </h3>
           <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
             {features.map((f) => (
@@ -146,19 +150,13 @@ const Landing = () => {
           </div>
           <div>
             <h3 className="font-serif text-2xl mb-3">
-              Por qué los abogados eligen {branding.app_title}
+              {t(c.why_title)}
             </h3>
-            <p className="text-muted-foreground leading-relaxed mb-3">
-              En la práctica jurídica, cada minuto cuenta y cada documento importa.
-              Perder un plazo, traspapelar un expediente o no encontrar a tiempo la
-              información de un cliente puede tener consecuencias graves.
+            <p className="text-muted-foreground leading-relaxed mb-3 whitespace-pre-line">
+              {t(c.why_paragraph_1)}
             </p>
-            <p className="text-muted-foreground leading-relaxed">
-              {branding.app_title} le ofrece <strong className="text-foreground">
-              orden, seguridad y eficiencia</strong>: sus datos protegidos en la
-              nube, accesibles desde cualquier dispositivo, con búsqueda inmediata
-              por número de cédula y un asistente con IA que le ayuda a redactar
-              y consultar más rápido.
+            <p className="text-muted-foreground leading-relaxed whitespace-pre-line">
+              {t(c.why_paragraph_2)}
             </p>
           </div>
         </div>
@@ -170,17 +168,17 @@ const Landing = () => {
           <div className="text-center mb-8">
             <BookOpen className="h-10 w-10 text-accent mx-auto mb-3" />
             <h3 className="font-serif text-2xl sm:text-3xl mb-2">
-              Solicite acceso a la aplicación
+              {t(c.contact_title)}
             </h3>
             <p className="text-muted-foreground">
-              Déjenos sus datos y nos pondremos en contacto para crearle su cuenta.
+              {t(c.contact_subtitle)}
             </p>
           </div>
           <Card className="p-6 sm:p-8 shadow-elegant">
             <form onSubmit={handleSubmit} className="space-y-4">
               <div className="grid sm:grid-cols-2 gap-4">
                 <div className="space-y-2">
-                  <Label htmlFor="fn">Nombre *</Label>
+                  <Label htmlFor="fn">{c.contact_first_name_label} *</Label>
                   <Input
                     id="fn" required maxLength={100}
                     value={form.first_name}
@@ -188,7 +186,7 @@ const Landing = () => {
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="ln">Apellido *</Label>
+                  <Label htmlFor="ln">{c.contact_last_name_label} *</Label>
                   <Input
                     id="ln" required maxLength={100}
                     value={form.last_name}
@@ -197,7 +195,7 @@ const Landing = () => {
                 </div>
               </div>
               <div className="space-y-2">
-                <Label htmlFor="em">Email (opcional)</Label>
+                <Label htmlFor="em">{c.contact_email_label}</Label>
                 <Input
                   id="em" type="email" maxLength={255}
                   value={form.email}
@@ -205,17 +203,17 @@ const Landing = () => {
                 />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="msg">Mensaje *</Label>
+                <Label htmlFor="msg">{c.contact_message_label} *</Label>
                 <Textarea
                   id="msg" required rows={5} maxLength={5000}
-                  placeholder="Cuéntenos sobre su despacho y cómo podemos ayudarle…"
+                  placeholder={c.contact_message_placeholder}
                   value={form.message}
                   onChange={(e) => setForm({ ...form, message: e.target.value })}
                 />
               </div>
               <Button type="submit" disabled={sending} className="w-full bg-primary hover:bg-primary-glow">
                 {sending ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : <Send className="h-4 w-4 mr-2" />}
-                Enviar solicitud
+                {c.contact_submit_label}
               </Button>
             </form>
           </Card>
@@ -225,7 +223,7 @@ const Landing = () => {
       {/* Footer */}
       <footer className="border-t bg-card">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 py-6 text-center text-xs text-muted-foreground">
-          © {new Date().getFullYear()} {branding.app_title} — {branding.app_subtitle}
+          {t(c.footer_text)}
         </div>
       </footer>
     </div>

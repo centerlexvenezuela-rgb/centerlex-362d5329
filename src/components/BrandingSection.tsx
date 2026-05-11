@@ -38,15 +38,16 @@ export const BrandingSection = () => {
 
   const handleSave = async () => {
     setSaving(true);
+    const { landing_content: _omit, ...brandingOnly } = form as any;
     const { data: existing } = await supabase
       .from("app_settings").select("id").limit(1).maybeSingle();
     let error;
     if (existing) {
       ({ error } = await supabase.from("app_settings")
-        .update({ ...form, updated_at: new Date().toISOString() })
+        .update({ ...brandingOnly, updated_at: new Date().toISOString() })
         .eq("id", existing.id));
     } else {
-      ({ error } = await supabase.from("app_settings").insert(form));
+      ({ error } = await supabase.from("app_settings").insert(brandingOnly));
     }
     setSaving(false);
     if (error) return toast.error(error.message);
