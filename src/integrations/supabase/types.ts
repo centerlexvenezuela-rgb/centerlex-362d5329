@@ -20,6 +20,7 @@ export type Database = {
           app_title: string
           favicon_url: string | null
           id: string
+          landing_content: Json
           logo_url: string | null
           meta_author: string
           meta_description: string
@@ -32,6 +33,7 @@ export type Database = {
           app_title?: string
           favicon_url?: string | null
           id?: string
+          landing_content?: Json
           logo_url?: string | null
           meta_author?: string
           meta_description?: string
@@ -44,6 +46,7 @@ export type Database = {
           app_title?: string
           favicon_url?: string | null
           id?: string
+          landing_content?: Json
           logo_url?: string | null
           meta_author?: string
           meta_description?: string
