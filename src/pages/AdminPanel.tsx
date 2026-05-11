@@ -17,6 +17,7 @@ import {
 } from "@/components/ui/alert-dialog";
 import { ShieldCheck, UserPlus, Trash2, LogOut, Loader2, Sparkles, Calculator } from "lucide-react";
 import { BrandingSection } from "@/components/BrandingSection";
+import { LandingContentSection } from "@/components/LandingContentSection";
 import { ContactMessagesSection } from "@/components/ContactMessagesSection";
 import { ChangePasswordSection } from "@/components/ChangePasswordSection";
 import { FeesAdminSection } from "@/components/FeesAdminSection";
