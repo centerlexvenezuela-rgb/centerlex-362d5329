@@ -222,8 +222,9 @@ export type Database = {
       documents: {
         Row: {
           case_id: string
-          content: string
+          content: string | null
           created_at: string
+          drive_file_id: string | null
           id: string
           title: string
           updated_at: string
@@ -231,8 +232,9 @@ export type Database = {
         }
         Insert: {
           case_id: string
-          content?: string
+          content?: string | null
           created_at?: string
+          drive_file_id?: string | null
           id?: string
           title: string
           updated_at?: string
@@ -240,8 +242,9 @@ export type Database = {
         }
         Update: {
           case_id?: string
-          content?: string
+          content?: string | null
           created_at?: string
+          drive_file_id?: string | null
           id?: string
           title?: string
           updated_at?: string
@@ -361,6 +364,10 @@ export type Database = {
           created_at: string
           fees_enabled: boolean
           first_name: string | null
+          google_connected_at: string | null
+          google_email: string | null
+          google_folder_id: string | null
+          google_refresh_token: string | null
           id: string
           last_name: string | null
           updated_at: string
@@ -371,6 +378,10 @@ export type Database = {
           created_at?: string
           fees_enabled?: boolean
           first_name?: string | null
+          google_connected_at?: string | null
+          google_email?: string | null
+          google_folder_id?: string | null
+          google_refresh_token?: string | null
           id?: string
           last_name?: string | null
           updated_at?: string
@@ -381,6 +392,10 @@ export type Database = {
           created_at?: string
           fees_enabled?: boolean
           first_name?: string | null
+          google_connected_at?: string | null
+          google_email?: string | null
+          google_folder_id?: string | null
+          google_refresh_token?: string | null
           id?: string
           last_name?: string | null
           updated_at?: string
