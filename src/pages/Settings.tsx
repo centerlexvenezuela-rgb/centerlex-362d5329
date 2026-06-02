@@ -1,4 +1,5 @@
 import { ChangePasswordSection } from "@/components/ChangePasswordSection";
+import { GoogleDriveSection } from "@/components/GoogleDriveSection";
 import { useAuth } from "@/hooks/useAuth";
 import { Card } from "@/components/ui/card";
 import { UserCircle } from "lucide-react";
@@ -19,6 +20,8 @@ const Settings = () => {
         </div>
         <p className="text-sm"><span className="text-muted-foreground">Email: </span><strong>{user?.email}</strong></p>
       </Card>
+
+      <GoogleDriveSection />
 
       <ChangePasswordSection />
     </div>
