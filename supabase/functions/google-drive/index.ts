@@ -165,6 +165,66 @@ async function driveDownload(accessToken: string, fileId: string): Promise<strin
   return await r.text();
 }
 
+async function driveDownloadBinary(
+  accessToken: string,
+  fileId: string,
+): Promise<Response> {
+  return await fetch(
+    `https://www.googleapis.com/drive/v3/files/${fileId}?alt=media`,
+    { headers: { Authorization: `Bearer ${accessToken}` } },
+  );
+}
+
+async function driveGetMeta(accessToken: string, fileId: string) {
+  const r = await fetch(
+    `https://www.googleapis.com/drive/v3/files/${fileId}?fields=id,name,mimeType,size`,
+    { headers: { Authorization: `Bearer ${accessToken}` } },
+  );
+  if (!r.ok) throw new Error(`drive meta: ${await r.text()}`);
+  return await r.json() as { id: string; name: string; mimeType: string; size?: string };
+}
+
+async function driveUploadBinary(
+  accessToken: string,
+  folderId: string,
+  name: string,
+  mimeType: string,
+  bytes: Uint8Array,
+): Promise<string> {
+  const boundary = "lexoffice" + crypto.randomUUID();
+  const metadata = { name, mimeType, parents: [folderId] };
+
+  const enc = new TextEncoder();
+  const pre = enc.encode(
+    `--${boundary}\r\n` +
+      `Content-Type: application/json; charset=UTF-8\r\n\r\n` +
+      JSON.stringify(metadata) +
+      `\r\n--${boundary}\r\n` +
+      `Content-Type: ${mimeType}\r\n` +
+      `Content-Transfer-Encoding: binary\r\n\r\n`,
+  );
+  const post = enc.encode(`\r\n--${boundary}--`);
+  const body = new Uint8Array(pre.length + bytes.length + post.length);
+  body.set(pre, 0);
+  body.set(bytes, pre.length);
+  body.set(post, pre.length + bytes.length);
+
+  const r = await fetch(
+    `https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart`,
+    {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+        "Content-Type": `multipart/related; boundary=${boundary}`,
+      },
+      body,
+    },
+  );
+  if (!r.ok) throw new Error(`drive upload bin: ${await r.text()}`);
+  const j = await r.json();
+  return j.id as string;
+}
+
 async function driveDelete(accessToken: string, fileId: string): Promise<void> {
   await fetch(`https://www.googleapis.com/drive/v3/files/${fileId}`, {
     method: "DELETE",
