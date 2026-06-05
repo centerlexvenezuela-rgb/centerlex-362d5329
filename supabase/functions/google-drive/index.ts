@@ -368,6 +368,14 @@ Deno.serve(async (req) => {
       const fileId = await driveUpload(token, folderId, body.title || "Escrito", body.content || "", body.fileId);
       return json({ fileId });
     }
+    if (action === "upload-file") {
+      // body: { fileName, mimeType, base64 }
+      const { fileName, mimeType, base64 } = body || {};
+      if (!fileName || !mimeType || !base64) return json({ error: "missing fields" }, 400);
+      const bin = Uint8Array.from(atob(base64), (c) => c.charCodeAt(0));
+      const fileId = await driveUploadBinary(token, folderId, fileName, mimeType, bin);
+      return json({ fileId, size: bin.length });
+    }
     if (action === "download") {
       const content = await driveDownload(token, body.fileId);
       return json({ content });
