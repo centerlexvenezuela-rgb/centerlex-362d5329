@@ -225,7 +225,11 @@ export type Database = {
           content: string | null
           created_at: string
           drive_file_id: string | null
+          file_name: string | null
           id: string
+          kind: string
+          mime_type: string | null
+          size_bytes: number | null
           title: string
           updated_at: string
           user_id: string
@@ -235,7 +239,11 @@ export type Database = {
           content?: string | null
           created_at?: string
           drive_file_id?: string | null
+          file_name?: string | null
           id?: string
+          kind?: string
+          mime_type?: string | null
+          size_bytes?: number | null
           title: string
           updated_at?: string
           user_id: string
@@ -245,7 +253,11 @@ export type Database = {
           content?: string | null
           created_at?: string
           drive_file_id?: string | null
+          file_name?: string | null
           id?: string
+          kind?: string
+          mime_type?: string | null
+          size_bytes?: number | null
           title?: string
           updated_at?: string
           user_id?: string
