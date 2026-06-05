@@ -299,6 +299,26 @@ Deno.serve(async (req) => {
       });
     }
 
+    // GET /file?fileId=...  streams the binary file via the user's Drive (used by browser to preview/download attachments)
+    if (req.method === "GET" && (path === "/file" || url.searchParams.get("action") === "file")) {
+      const u = await authedUser(req);
+      if (!u) return new Response("Unauthorized", { status: 401, headers: corsHeaders });
+      const fileId = url.searchParams.get("fileId");
+      if (!fileId) return new Response("missing fileId", { status: 400, headers: corsHeaders });
+      const { token } = await getUserAccessToken(u.id);
+      const meta = await driveGetMeta(token, fileId);
+      const upstream = await driveDownloadBinary(token, fileId);
+      if (!upstream.ok) {
+        return new Response(await upstream.text(), { status: upstream.status, headers: corsHeaders });
+      }
+      const headers = new Headers(corsHeaders);
+      headers.set("Content-Type", meta.mimeType || upstream.headers.get("content-type") || "application/octet-stream");
+      headers.set("Content-Disposition", `inline; filename="${encodeURIComponent(meta.name)}"`);
+      const len = upstream.headers.get("content-length");
+      if (len) headers.set("Content-Length", len);
+      return new Response(upstream.body, { status: 200, headers });
+    }
+
     const body = req.method === "POST" ? await req.json().catch(() => ({})) : {};
     const action = body.action || url.searchParams.get("action");
 
