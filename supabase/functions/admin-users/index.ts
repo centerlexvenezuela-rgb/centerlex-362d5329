@@ -65,7 +65,7 @@ Deno.serve(async (req) => {
       const { data: roles } = await admin.from("user_roles").select("user_id, role");
       const { data: profiles } = await admin
         .from("profiles")
-        .select("user_id, first_name, last_name, ai_enabled, fees_enabled");
+        .select("user_id, first_name, last_name, ai_enabled, fees_enabled, prestaciones_enabled");
       const lawyers = list.users
         .map((u) => {
           const r = roles?.find((x) => x.user_id === u.id);
@@ -79,6 +79,7 @@ Deno.serve(async (req) => {
             last_name: p?.last_name ?? null,
             ai_enabled: p?.ai_enabled ?? false,
             fees_enabled: p?.fees_enabled ?? false,
+            prestaciones_enabled: p?.prestaciones_enabled ?? false,
           };
         })
         .filter((u) => u.role === "lawyer");
@@ -123,10 +124,18 @@ Deno.serve(async (req) => {
       });
     }
 
-    if (action === "toggle_ai" || action === "toggle_fees") {
+    if (action === "toggle_ai" || action === "toggle_fees" || action === "toggle_prestaciones") {
       const { user_id } = body;
-      const field = action === "toggle_ai" ? "ai_enabled" : "fees_enabled";
-      const value = action === "toggle_ai" ? body.ai_enabled : body.fees_enabled;
+      const fieldMap = {
+        toggle_ai: "ai_enabled",
+        toggle_fees: "fees_enabled",
+        toggle_prestaciones: "prestaciones_enabled",
+      } as const;
+      const field = fieldMap[action as keyof typeof fieldMap];
+      const value =
+        action === "toggle_ai" ? body.ai_enabled
+        : action === "toggle_fees" ? body.fees_enabled
+        : body.prestaciones_enabled;
       if (!user_id || typeof value !== "boolean") {
         return new Response(JSON.stringify({ error: "Parámetros inválidos" }), {
           status: 400,
