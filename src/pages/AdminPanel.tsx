@@ -15,12 +15,13 @@ import {
   AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
-import { ShieldCheck, UserPlus, Trash2, LogOut, Loader2, Sparkles, Calculator } from "lucide-react";
+import { ShieldCheck, UserPlus, Trash2, LogOut, Loader2, Sparkles, Calculator, Banknote } from "lucide-react";
 import { BrandingSection } from "@/components/BrandingSection";
 import { LandingContentSection } from "@/components/LandingContentSection";
 import { ContactMessagesSection } from "@/components/ContactMessagesSection";
 import { ChangePasswordSection } from "@/components/ChangePasswordSection";
 import { FeesAdminSection } from "@/components/FeesAdminSection";
+import { PrestacionesAdminSection } from "@/components/PrestacionesAdminSection";
 import { BackupSection } from "@/components/BackupSection";
 import { toast } from "sonner";
 
@@ -33,6 +34,7 @@ interface Lawyer {
   last_name: string | null;
   ai_enabled: boolean;
   fees_enabled: boolean;
+  prestaciones_enabled: boolean;
 }
 
 const AdminPanel = () => {
@@ -117,6 +119,20 @@ const AdminPanel = () => {
       return toast.error(error?.message ?? data?.error ?? "Error");
     }
     toast.success(next ? "Calculadora de Honorarios habilitada" : "Calculadora de Honorarios deshabilitada");
+  };
+
+  const handleTogglePrestaciones = async (id: string, next: boolean) => {
+    setTogglingId(id);
+    setLawyers((prev) => prev.map((l) => (l.id === id ? { ...l, prestaciones_enabled: next } : l)));
+    const { data, error } = await supabase.functions.invoke("admin-users", {
+      body: { action: "toggle_prestaciones", user_id: id, prestaciones_enabled: next },
+    });
+    setTogglingId(null);
+    if (error || data?.error) {
+      setLawyers((prev) => prev.map((l) => (l.id === id ? { ...l, prestaciones_enabled: !next } : l)));
+      return toast.error(error?.message ?? data?.error ?? "Error");
+    }
+    toast.success(next ? "Calculadora de Prestaciones habilitada" : "Calculadora de Prestaciones deshabilitada");
   };
 
   const handleSignOut = async () => {
@@ -228,6 +244,11 @@ const AdminPanel = () => {
                         <Calculator className="h-3.5 w-3.5" /> Honorarios
                       </span>
                     </TableHead>
+                    <TableHead className="text-center">
+                      <span className="inline-flex items-center gap-1">
+                        <Banknote className="h-3.5 w-3.5" /> Prestaciones
+                      </span>
+                    </TableHead>
                     <TableHead className="text-right">Acciones</TableHead>
                   </TableRow>
                 </TableHeader>
@@ -264,6 +285,18 @@ const AdminPanel = () => {
                             />
                             <span className="text-xs text-muted-foreground">
                               {l.fees_enabled ? "Activa" : "Inactiva"}
+                            </span>
+                          </div>
+                        </TableCell>
+                        <TableCell className="text-center">
+                          <div className="inline-flex items-center gap-2">
+                            <Switch
+                              checked={l.prestaciones_enabled}
+                              disabled={togglingId === l.id}
+                              onCheckedChange={(v) => handleTogglePrestaciones(l.id, v)}
+                            />
+                            <span className="text-xs text-muted-foreground">
+                              {l.prestaciones_enabled ? "Activa" : "Inactiva"}
                             </span>
                           </div>
                         </TableCell>
@@ -305,6 +338,8 @@ const AdminPanel = () => {
         </Card>
 
         <FeesAdminSection />
+
+        <PrestacionesAdminSection />
 
         <BackupSection />
       </main>

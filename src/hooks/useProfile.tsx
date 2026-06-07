@@ -7,6 +7,7 @@ export interface LawyerProfile {
   last_name: string | null;
   ai_enabled: boolean;
   fees_enabled: boolean;
+  prestaciones_enabled: boolean;
 }
 
 export const useProfile = () => {
@@ -24,11 +25,11 @@ export const useProfile = () => {
       setLoading(true);
       const { data } = await supabase
         .from("profiles")
-        .select("first_name, last_name, ai_enabled, fees_enabled")
+        .select("first_name, last_name, ai_enabled, fees_enabled, prestaciones_enabled")
         .eq("user_id", user.id)
         .maybeSingle();
       setProfile(
-        data ?? { first_name: null, last_name: null, ai_enabled: false, fees_enabled: false }
+        data ?? { first_name: null, last_name: null, ai_enabled: false, fees_enabled: false, prestaciones_enabled: false }
       );
       setLoading(false);
     };

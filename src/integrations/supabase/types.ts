@@ -370,6 +370,66 @@ export type Database = {
         }
         Relationships: []
       }
+      prestaciones_settings: {
+        Row: {
+          created_at: string
+          dias_adicionales_por_anio: number
+          dias_mes_salario: number
+          dias_por_trimestre: number
+          id: string
+          multiplicador_indemnizacion: number
+          tasa_interes_anual_default: number
+          tope_dias_adicionales: number
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          dias_adicionales_por_anio?: number
+          dias_mes_salario?: number
+          dias_por_trimestre?: number
+          id?: string
+          multiplicador_indemnizacion?: number
+          tasa_interes_anual_default?: number
+          tope_dias_adicionales?: number
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          dias_adicionales_por_anio?: number
+          dias_mes_salario?: number
+          dias_por_trimestre?: number
+          id?: string
+          multiplicador_indemnizacion?: number
+          tasa_interes_anual_default?: number
+          tope_dias_adicionales?: number
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      prestaciones_tasas_bcv: {
+        Row: {
+          created_at: string
+          id: string
+          mes: string
+          tasa_anual_porcentaje: number
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          mes: string
+          tasa_anual_porcentaje: number
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          mes?: string
+          tasa_anual_porcentaje?: number
+          updated_at?: string
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           ai_enabled: boolean
@@ -382,6 +442,7 @@ export type Database = {
           google_refresh_token: string | null
           id: string
           last_name: string | null
+          prestaciones_enabled: boolean
           updated_at: string
           user_id: string
         }
@@ -396,6 +457,7 @@ export type Database = {
           google_refresh_token?: string | null
           id?: string
           last_name?: string | null
+          prestaciones_enabled?: boolean
           updated_at?: string
           user_id: string
         }
@@ -410,6 +472,7 @@ export type Database = {
           google_refresh_token?: string | null
           id?: string
           last_name?: string | null
+          prestaciones_enabled?: boolean
           updated_at?: string
           user_id?: string
         }

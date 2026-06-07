@@ -21,6 +21,7 @@ import SearchPage from "./pages/SearchPage";
 import Assistant from "./pages/Assistant";
 import Settings from "./pages/Settings";
 import Fees from "./pages/Fees";
+import Prestaciones from "./pages/Prestaciones";
 import NotFound from "./pages/NotFound.tsx";
 
 const queryClient = new QueryClient();
@@ -55,6 +56,7 @@ const App = () => (
               <Route path="/buscar" element={<SearchPage />} />
               <Route path="/asistente" element={<Assistant />} />
               <Route path="/honorarios" element={<Fees />} />
+              <Route path="/prestaciones" element={<Prestaciones />} />
               <Route path="/cuenta" element={<Settings />} />
             </Route>
             <Route path="*" element={<NotFound />} />
