@@ -244,6 +244,11 @@ const AdminPanel = () => {
                         <Calculator className="h-3.5 w-3.5" /> Honorarios
                       </span>
                     </TableHead>
+                    <TableHead className="text-center">
+                      <span className="inline-flex items-center gap-1">
+                        <Banknote className="h-3.5 w-3.5" /> Prestaciones
+                      </span>
+                    </TableHead>
                     <TableHead className="text-right">Acciones</TableHead>
                   </TableRow>
                 </TableHeader>
@@ -280,6 +285,18 @@ const AdminPanel = () => {
                             />
                             <span className="text-xs text-muted-foreground">
                               {l.fees_enabled ? "Activa" : "Inactiva"}
+                            </span>
+                          </div>
+                        </TableCell>
+                        <TableCell className="text-center">
+                          <div className="inline-flex items-center gap-2">
+                            <Switch
+                              checked={l.prestaciones_enabled}
+                              disabled={togglingId === l.id}
+                              onCheckedChange={(v) => handleTogglePrestaciones(l.id, v)}
+                            />
+                            <span className="text-xs text-muted-foreground">
+                              {l.prestaciones_enabled ? "Activa" : "Inactiva"}
                             </span>
                           </div>
                         </TableCell>
@@ -321,6 +338,8 @@ const AdminPanel = () => {
         </Card>
 
         <FeesAdminSection />
+
+        <PrestacionesAdminSection />
 
         <BackupSection />
       </main>
