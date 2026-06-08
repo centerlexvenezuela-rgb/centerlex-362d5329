@@ -65,17 +65,6 @@ const AdminPanel = () => {
   const [city, setCity] = useState("");
   const [stateField, setStateField] = useState<string>("");
 
-const AdminPanel = () => {
-  const navigate = useNavigate();
-  const { signOut, user } = useAuth();
-  const [lawyers, setLawyers] = useState<Lawyer[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [creating, setCreating] = useState(false);
-  const [togglingId, setTogglingId] = useState<string | null>(null);
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [firstName, setFirstName] = useState("");
-  const [lastName, setLastName] = useState("");
 
   const load = async () => {
     setLoading(true);
