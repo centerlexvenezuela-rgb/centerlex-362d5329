@@ -22,6 +22,7 @@ import Assistant from "./pages/Assistant";
 import Settings from "./pages/Settings";
 import Fees from "./pages/Fees";
 import Prestaciones from "./pages/Prestaciones";
+import Directory from "./pages/Directory";
 import NotFound from "./pages/NotFound.tsx";
 
 const queryClient = new QueryClient();
@@ -37,6 +38,7 @@ const App = () => (
         <AuthProvider>
           <Routes>
             <Route path="/" element={<Landing />} />
+            <Route path="/directorio" element={<Directory />} />
             <Route path="/auth" element={<Auth />} />
             <Route path="/admin/login" element={<AdminAuth />} />
             <Route
