@@ -58,7 +58,7 @@ const Directory = () => {
         toast.error("No se pudo cargar el directorio");
         return;
       }
-      setLawyers((data as Lawyer[]) ?? []);
+      setLawyers(((data as unknown) as Lawyer[]) ?? []);
     })();
   }, []);
 
