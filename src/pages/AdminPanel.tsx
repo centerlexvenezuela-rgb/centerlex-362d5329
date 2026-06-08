@@ -169,6 +169,8 @@ const AdminPanel = () => {
       return toast.error(error?.message ?? data?.error ?? "Error");
     }
     toast.success(next ? "Abogado visible en el directorio" : "Abogado oculto del directorio");
+  };
+
 
   const handleSignOut = async () => {
     await signOut();
