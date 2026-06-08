@@ -157,6 +157,19 @@ const AdminPanel = () => {
     toast.success(next ? "Calculadora de Prestaciones habilitada" : "Calculadora de Prestaciones deshabilitada");
   };
 
+  const handleToggleDirectory = async (id: string, next: boolean) => {
+    setTogglingId(id);
+    setLawyers((prev) => prev.map((l) => (l.id === id ? { ...l, directory_enabled: next } : l)));
+    const { data, error } = await supabase.functions.invoke("admin-users", {
+      body: { action: "toggle_directory", user_id: id, directory_enabled: next },
+    });
+    setTogglingId(null);
+    if (error || data?.error) {
+      setLawyers((prev) => prev.map((l) => (l.id === id ? { ...l, directory_enabled: !next } : l)));
+      return toast.error(error?.message ?? data?.error ?? "Error");
+    }
+    toast.success(next ? "Abogado visible en el directorio" : "Abogado oculto del directorio");
+
   const handleSignOut = async () => {
     await signOut();
     navigate("/admin/login");
