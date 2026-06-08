@@ -8,6 +8,9 @@ import { Label } from "@/components/ui/label";
 import { Card } from "@/components/ui/card";
 import { Switch } from "@/components/ui/switch";
 import {
+  Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
+} from "@/components/ui/select";
+import {
   Table, TableBody, TableCell, TableHead, TableHeader, TableRow,
 } from "@/components/ui/table";
 import {
@@ -15,7 +18,7 @@ import {
   AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
-import { ShieldCheck, UserPlus, Trash2, LogOut, Loader2, Sparkles, Calculator, Banknote } from "lucide-react";
+import { ShieldCheck, UserPlus, Trash2, LogOut, Loader2, Sparkles, Calculator, Banknote, Pencil, UserSquare2 } from "lucide-react";
 import { BrandingSection } from "@/components/BrandingSection";
 import { LandingContentSection } from "@/components/LandingContentSection";
 import { ContactMessagesSection } from "@/components/ContactMessagesSection";
@@ -23,6 +26,8 @@ import { ChangePasswordSection } from "@/components/ChangePasswordSection";
 import { FeesAdminSection } from "@/components/FeesAdminSection";
 import { PrestacionesAdminSection } from "@/components/PrestacionesAdminSection";
 import { BackupSection } from "@/components/BackupSection";
+import { EditLawyerDialog } from "@/components/EditLawyerDialog";
+import { VENEZUELA_STATES } from "@/lib/venezuela";
 import { toast } from "sonner";
 
 interface Lawyer {
@@ -35,6 +40,12 @@ interface Lawyer {
   ai_enabled: boolean;
   fees_enabled: boolean;
   prestaciones_enabled: boolean;
+  directory_enabled: boolean;
+  whatsapp: string | null;
+  bar_association: string | null;
+  city: string | null;
+  state: string | null;
+  photo_url: string | null;
 }
 
 const AdminPanel = () => {
@@ -44,10 +55,16 @@ const AdminPanel = () => {
   const [loading, setLoading] = useState(true);
   const [creating, setCreating] = useState(false);
   const [togglingId, setTogglingId] = useState<string | null>(null);
+  const [editing, setEditing] = useState<Lawyer | null>(null);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
+  const [whatsapp, setWhatsapp] = useState("");
+  const [bar, setBar] = useState("");
+  const [city, setCity] = useState("");
+  const [stateField, setStateField] = useState<string>("");
+
 
   const load = async () => {
     setLoading(true);
@@ -71,6 +88,10 @@ const AdminPanel = () => {
         password,
         first_name: firstName.trim() || null,
         last_name: lastName.trim() || null,
+        whatsapp: whatsapp.replace(/\D/g, "") || null,
+        bar_association: bar.trim() || null,
+        city: city.trim() || null,
+        state: stateField || null,
       },
     });
     setCreating(false);
@@ -79,6 +100,7 @@ const AdminPanel = () => {
     }
     toast.success(`Cuenta creada para ${email}`);
     setEmail(""); setPassword(""); setFirstName(""); setLastName("");
+    setWhatsapp(""); setBar(""); setCity(""); setStateField("");
     load();
   };
 
@@ -134,6 +156,21 @@ const AdminPanel = () => {
     }
     toast.success(next ? "Calculadora de Prestaciones habilitada" : "Calculadora de Prestaciones deshabilitada");
   };
+
+  const handleToggleDirectory = async (id: string, next: boolean) => {
+    setTogglingId(id);
+    setLawyers((prev) => prev.map((l) => (l.id === id ? { ...l, directory_enabled: next } : l)));
+    const { data, error } = await supabase.functions.invoke("admin-users", {
+      body: { action: "toggle_directory", user_id: id, directory_enabled: next },
+    });
+    setTogglingId(null);
+    if (error || data?.error) {
+      setLawyers((prev) => prev.map((l) => (l.id === id ? { ...l, directory_enabled: !next } : l)));
+      return toast.error(error?.message ?? data?.error ?? "Error");
+    }
+    toast.success(next ? "Abogado visible en el directorio" : "Abogado oculto del directorio");
+  };
+
 
   const handleSignOut = async () => {
     await signOut();
@@ -197,6 +234,41 @@ const AdminPanel = () => {
               />
             </div>
             <div className="space-y-2">
+              <Label htmlFor="wa">WhatsApp <span className="text-muted-foreground">(opcional)</span></Label>
+              <Input
+                id="wa" type="text"
+                value={whatsapp} onChange={(e) => setWhatsapp(e.target.value)}
+                placeholder="584141234567"
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="ba">Colegio de abogados <span className="text-muted-foreground">(opcional)</span></Label>
+              <Input
+                id="ba" type="text"
+                value={bar} onChange={(e) => setBar(e.target.value)}
+                placeholder="Colegio de Abogados del Distrito Capital"
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="ci">Ciudad <span className="text-muted-foreground">(opcional)</span></Label>
+              <Input
+                id="ci" type="text"
+                value={city} onChange={(e) => setCity(e.target.value)}
+                placeholder="Caracas"
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="st">Estado <span className="text-muted-foreground">(opcional)</span></Label>
+              <Select value={stateField} onValueChange={setStateField}>
+                <SelectTrigger id="st"><SelectValue placeholder="Selecciona estado…" /></SelectTrigger>
+                <SelectContent>
+                  {VENEZUELA_STATES.map((s) => (
+                    <SelectItem key={s.name} value={s.name}>{s.name}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="space-y-2">
               <Label htmlFor="np">Contraseña inicial</Label>
               <Input
                 id="np" type="text" required minLength={6}
@@ -247,6 +319,11 @@ const AdminPanel = () => {
                     <TableHead className="text-center">
                       <span className="inline-flex items-center gap-1">
                         <Banknote className="h-3.5 w-3.5" /> Prestaciones
+                      </span>
+                    </TableHead>
+                    <TableHead className="text-center">
+                      <span className="inline-flex items-center gap-1">
+                        <UserSquare2 className="h-3.5 w-3.5" /> Directorio
                       </span>
                     </TableHead>
                     <TableHead className="text-right">Acciones</TableHead>
@@ -300,7 +377,26 @@ const AdminPanel = () => {
                             </span>
                           </div>
                         </TableCell>
+                        <TableCell className="text-center">
+                          <div className="inline-flex items-center gap-2">
+                            <Switch
+                              checked={l.directory_enabled}
+                              disabled={togglingId === l.id}
+                              onCheckedChange={(v) => handleToggleDirectory(l.id, v)}
+                            />
+                            <span className="text-xs text-muted-foreground">
+                              {l.directory_enabled ? "Visible" : "Oculto"}
+                            </span>
+                          </div>
+                        </TableCell>
                         <TableCell className="text-right">
+                          <Button
+                            variant="ghost" size="sm"
+                            onClick={() => setEditing(l)}
+                            title="Editar perfil"
+                          >
+                            <Pencil className="h-4 w-4" />
+                          </Button>
                           <AlertDialog>
                             <AlertDialogTrigger asChild>
                               <Button variant="ghost" size="sm" className="text-destructive hover:text-destructive">
@@ -343,6 +439,15 @@ const AdminPanel = () => {
 
         <BackupSection />
       </main>
+
+      {editing && (
+        <EditLawyerDialog
+          open={!!editing}
+          onOpenChange={(o) => !o && setEditing(null)}
+          lawyer={editing}
+          onSaved={load}
+        />
+      )}
     </div>
   );
 };

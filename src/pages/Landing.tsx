@@ -82,11 +82,16 @@ const Landing = () => {
               <p className="text-[10px] sm:text-xs text-muted-foreground">{branding.app_subtitle}</p>
             </div>
           </div>
-          <Button asChild variant="outline" size="sm">
-            <Link to="/auth">
-              <LogIn className="h-4 w-4 mr-1.5" /> {c.header_login_button}
-            </Link>
-          </Button>
+          <div className="flex items-center gap-2">
+            <Button asChild variant="ghost" size="sm" className="hidden sm:inline-flex">
+              <Link to="/directorio">Directorio</Link>
+            </Button>
+            <Button asChild variant="outline" size="sm">
+              <Link to="/auth">
+                <LogIn className="h-4 w-4 mr-1.5" /> {c.header_login_button}
+              </Link>
+            </Button>
+          </div>
         </div>
       </header>
 
@@ -159,6 +164,28 @@ const Landing = () => {
               {t(c.why_paragraph_2)}
             </p>
           </div>
+        </div>
+      </section>
+
+      {/* Directorio CTA */}
+      <section className="relative overflow-hidden bg-gradient-to-br from-primary/10 via-accent/5 to-primary/10 py-14 sm:py-20 border-y">
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 text-center">
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-accent/10 text-accent text-xs font-medium mb-4">
+            <Users className="h-3.5 w-3.5" /> Directorio profesional verificado
+          </div>
+          <h3 className="font-serif text-3xl sm:text-4xl mb-4 leading-tight">
+            ¿Necesitas un abogado en Venezuela?
+          </h3>
+          <p className="text-base sm:text-lg text-muted-foreground max-w-2xl mx-auto mb-8">
+            Encuentra profesionales del derecho en tu estado, con datos de contacto
+            directo por WhatsApp y correo. Asesoría jurídica confiable cerca de ti,
+            en cualquier región del país.
+          </p>
+          <Button asChild size="lg" className="bg-primary hover:bg-primary-glow shadow-elegant">
+            <Link to="/directorio">
+              <Users className="h-5 w-5 mr-2" /> Ver Directorio de Abogados
+            </Link>
+          </Button>
         </div>
       </section>
 

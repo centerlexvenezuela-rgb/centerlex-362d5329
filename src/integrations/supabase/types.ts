@@ -433,7 +433,11 @@ export type Database = {
       profiles: {
         Row: {
           ai_enabled: boolean
+          bar_association: string | null
+          city: string | null
           created_at: string
+          directory_enabled: boolean
+          email: string | null
           fees_enabled: boolean
           first_name: string | null
           google_connected_at: string | null
@@ -442,13 +446,20 @@ export type Database = {
           google_refresh_token: string | null
           id: string
           last_name: string | null
+          photo_url: string | null
           prestaciones_enabled: boolean
+          state: string | null
           updated_at: string
           user_id: string
+          whatsapp: string | null
         }
         Insert: {
           ai_enabled?: boolean
+          bar_association?: string | null
+          city?: string | null
           created_at?: string
+          directory_enabled?: boolean
+          email?: string | null
           fees_enabled?: boolean
           first_name?: string | null
           google_connected_at?: string | null
@@ -457,13 +468,20 @@ export type Database = {
           google_refresh_token?: string | null
           id?: string
           last_name?: string | null
+          photo_url?: string | null
           prestaciones_enabled?: boolean
+          state?: string | null
           updated_at?: string
           user_id: string
+          whatsapp?: string | null
         }
         Update: {
           ai_enabled?: boolean
+          bar_association?: string | null
+          city?: string | null
           created_at?: string
+          directory_enabled?: boolean
+          email?: string | null
           fees_enabled?: boolean
           first_name?: string | null
           google_connected_at?: string | null
@@ -472,9 +490,12 @@ export type Database = {
           google_refresh_token?: string | null
           id?: string
           last_name?: string | null
+          photo_url?: string | null
           prestaciones_enabled?: boolean
+          state?: string | null
           updated_at?: string
           user_id?: string
+          whatsapp?: string | null
         }
         Relationships: []
       }
@@ -501,7 +522,42 @@ export type Database = {
       }
     }
     Views: {
-      [_ in never]: never
+      lawyers_directory: {
+        Row: {
+          bar_association: string | null
+          city: string | null
+          email: string | null
+          first_name: string | null
+          last_name: string | null
+          photo_url: string | null
+          state: string | null
+          user_id: string | null
+          whatsapp: string | null
+        }
+        Insert: {
+          bar_association?: string | null
+          city?: string | null
+          email?: string | null
+          first_name?: string | null
+          last_name?: string | null
+          photo_url?: string | null
+          state?: string | null
+          user_id?: string | null
+          whatsapp?: string | null
+        }
+        Update: {
+          bar_association?: string | null
+          city?: string | null
+          email?: string | null
+          first_name?: string | null
+          last_name?: string | null
+          photo_url?: string | null
+          state?: string | null
+          user_id?: string | null
+          whatsapp?: string | null
+        }
+        Relationships: []
+      }
     }
     Functions: {
       has_role: {
