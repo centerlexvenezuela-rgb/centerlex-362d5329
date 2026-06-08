@@ -8,6 +8,9 @@ import { Label } from "@/components/ui/label";
 import { Card } from "@/components/ui/card";
 import { Switch } from "@/components/ui/switch";
 import {
+  Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
+} from "@/components/ui/select";
+import {
   Table, TableBody, TableCell, TableHead, TableHeader, TableRow,
 } from "@/components/ui/table";
 import {
@@ -15,7 +18,7 @@ import {
   AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
-import { ShieldCheck, UserPlus, Trash2, LogOut, Loader2, Sparkles, Calculator, Banknote } from "lucide-react";
+import { ShieldCheck, UserPlus, Trash2, LogOut, Loader2, Sparkles, Calculator, Banknote, Pencil, UserSquare2 } from "lucide-react";
 import { BrandingSection } from "@/components/BrandingSection";
 import { LandingContentSection } from "@/components/LandingContentSection";
 import { ContactMessagesSection } from "@/components/ContactMessagesSection";
@@ -23,6 +26,8 @@ import { ChangePasswordSection } from "@/components/ChangePasswordSection";
 import { FeesAdminSection } from "@/components/FeesAdminSection";
 import { PrestacionesAdminSection } from "@/components/PrestacionesAdminSection";
 import { BackupSection } from "@/components/BackupSection";
+import { EditLawyerDialog } from "@/components/EditLawyerDialog";
+import { VENEZUELA_STATES } from "@/lib/venezuela";
 import { toast } from "sonner";
 
 interface Lawyer {
@@ -35,7 +40,30 @@ interface Lawyer {
   ai_enabled: boolean;
   fees_enabled: boolean;
   prestaciones_enabled: boolean;
+  directory_enabled: boolean;
+  whatsapp: string | null;
+  bar_association: string | null;
+  city: string | null;
+  state: string | null;
+  photo_url: string | null;
 }
+
+const AdminPanel = () => {
+  const navigate = useNavigate();
+  const { signOut, user } = useAuth();
+  const [lawyers, setLawyers] = useState<Lawyer[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [creating, setCreating] = useState(false);
+  const [togglingId, setTogglingId] = useState<string | null>(null);
+  const [editing, setEditing] = useState<Lawyer | null>(null);
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [firstName, setFirstName] = useState("");
+  const [lastName, setLastName] = useState("");
+  const [whatsapp, setWhatsapp] = useState("");
+  const [bar, setBar] = useState("");
+  const [city, setCity] = useState("");
+  const [stateField, setStateField] = useState<string>("");
 
 const AdminPanel = () => {
   const navigate = useNavigate();
