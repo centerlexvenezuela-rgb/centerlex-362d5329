@@ -1,97 +1,68 @@
-## Calculadora de Prestaciones Sociales (LOTTT)
+# Directorio de Abogados
 
-Replicaré la arquitectura del módulo de Honorarios: toggle por abogado desde el panel admin, parámetros editables por el admin, y página de uso para el abogado.
+Crear un directorio público de abogados con búsqueda, filtro por estado de Venezuela y ordenamiento por cercanía geográfica. Los datos se gestionan desde el panel de administración con campos nuevos en el perfil y aprobación manual del administrador.
 
-### 1. Base de datos (migración)
+## 1. Base de datos (migración)
 
-**Toggle por abogado**
-- `profiles.prestaciones_enabled BOOLEAN NOT NULL DEFAULT false`
+Agregar columnas a `profiles`:
+- `whatsapp` (text, opcional)
+- `bar_association` (text, opcional) — colegio de abogados
+- `city` (text, opcional)
+- `state` (text, opcional) — uno de los 24 estados de Venezuela + Distrito Capital
+- `photo_url` (text, opcional)
+- `directory_enabled` (boolean, default false) — aprobación del admin
 
-**Parámetros globales editables por admin** — nueva tabla `prestaciones_settings` (singleton, 1 fila):
-- `dias_por_trimestre` (default 15) — art. 142 LOTTT
-- `dias_adicionales_por_año` (default 2)
-- `tope_dias_adicionales` (default 30)
-- `multiplicador_indemnizacion` (default 2) — art. 92
-- `tasa_interes_anual_default` (default 18.00) — fallback si no hay histórico BCV
-- `dias_mes_salario` (default 30)
+Crear bucket público `lawyer-photos` para las fotos.
 
-**Histórico de tasas BCV** — tabla `prestaciones_tasas_bcv`:
-- `mes` (DATE, primer día del mes, UNIQUE)
-- `tasa_anual_porcentaje` NUMERIC(6,3)
+Política RLS adicional en `profiles`: permitir `SELECT` a `anon` y `authenticated` SOLO de los campos públicos (a través de una vista `public.lawyers_directory`) cuando `directory_enabled = true`. La vista expondrá únicamente: first_name, last_name, whatsapp, email, bar_association, city, state, photo_url.
 
-Ambas tablas: RLS — lectura para `authenticated`, escritura solo para `admin` (vía `has_role`). GRANTs explícitas.
+## 2. Panel de administración
 
-### 2. Edge function (`admin-users`)
-Agregar acción `toggle_prestaciones` análoga a `toggle_fees`.
+### Formulario de creación de abogado (`AdminPanel.tsx`)
+Añadir campos opcionales: WhatsApp, Colegio de Abogados, Ciudad, Estado (select con estados de Venezuela), foto (upload al bucket).
 
-### 3. Panel de Administración (`AdminPanel.tsx`)
-- Nueva columna en la tabla de abogados: **Prestaciones** (icono Scale) con Switch igual que IA/Honorarios.
-- Nueva sección `PrestacionesAdminSection` con dos cards:
-  - Parámetros de cálculo (form editando la fila singleton).
-  - Tasas BCV mensuales (tabla con add/edit/delete + import opcional pegando CSV).
+### Edición de abogado existente
+Nuevo botón "Editar" por fila que abre un diálogo con los mismos campos opcionales + cambio de foto.
 
-### 4. Hook `useProfile`
-Incluir `prestaciones_enabled` en el select y tipo.
+### Tabla de abogados
+Nueva columna "Directorio" con `Switch` (igual que Honorarios/Prestaciones) que llama a una acción `toggle_directory` en la edge function `admin-users`.
 
-### 5. Navegación (`AppLayout`)
-Agregar enlace **Prestaciones Sociales** visible solo si `profile.prestaciones_enabled`. Ruta `/prestaciones`.
+### Edge function `admin-users`
+- Extender `create` y agregar acción `update_profile` para guardar los nuevos campos.
+- Agregar acción `toggle_directory`.
+- Devolver los nuevos campos en `list`.
 
-### 6. Página `src/pages/Prestaciones.tsx`
-Formulario mínimo para el abogado:
-- Nombre del trabajador (opcional, para el reporte)
-- Fecha de inicio (DatePicker)
-- Fecha de fin
-- Último salario mensual integral (Bs.)
-- Motivo de terminación: select (despido injustificado / despido justificado / renuncia voluntaria / mutuo acuerdo / jubilación)
-- Si despido injustificado → switch "trabajador elige indemnización"
-- Anticipos recibidos (opcional, Bs.)
-- Botón **Calcular**
+## 3. Página pública del directorio
 
-Resultado en card con desglose: días antigüedad, días adicionales, capital, intereses, total prestaciones, indemnización art. 92, anticipos restados, **total a pagar en Bs.** Botón de exportar a PDF (reutilizar `exportDocs.ts`) opcional simple — imprimir.
+Nueva ruta `/directorio` (pública, sin auth) en `src/pages/Directory.tsx`:
+- Header con título y CTA.
+- Buscador por nombre.
+- Filtro select por estado de Venezuela.
+- Botón "Usar mi ubicación" → `navigator.geolocation` → geocoding inverso (Google Maps connector si está disponible, o mapeo aproximado lat/lng → estado) para autoseleccionar el estado más cercano y ordenar los resultados.
+- Grid de tarjetas con foto, nombre, colegio, ciudad/estado, botones WhatsApp (wa.me/) y correo (mailto:).
+- SEO: title, meta description, H1, alt text en fotos.
 
-### 7. Lógica de cálculo (`src/lib/prestaciones.ts`)
-Implementación pura, testeable, siguiendo el esquema exacto del usuario:
+Consulta: `supabase.from('lawyers_directory').select('*')` (vista pública).
 
-```text
-días_totales = (fecha_fin - fecha_inicio) + 1
-meses = ceil(días_totales / 30)
-trimestres = ceil(meses / 3)
-años_completos = ajuste por mes/día
-salario_diario = salario_mensual_integral / 30
-días_antigüedad = 15 × trimestres
-días_adicionales = años>1 ? min(2×(años-1), 30) : 0
-capital = (días_antigüedad + días_adicionales) × salario_diario
+## 4. Landing page
 
-flujos:
-  trimestres 1..(n-1): fecha_inicio + 3m×i, monto 15×sd
-  años 2..años_completos: fecha_inicio + a años, monto 2×sd
+Agregar sección/CTA con título "Encuentra un abogado en Venezuela" + descripción + botón "Ver Directorio de Abogados" → `/directorio`. Incluir enlace en navegación principal de la landing.
 
-intereses: para cada flujo, capitalización compuesta mensual
-  usando tasas BCV por mes, fallback a tasa_default
-total_prestaciones = capital + intereses
-indemnización = (injustificado && elige) ? 2×total_prestaciones : 0
-total_pagar = total_prestaciones + indemnización − anticipos
-```
+## 5. Estados de Venezuela
 
-Format Bs. con `Intl.NumberFormat('es-VE', { style:'currency', currency:'VES' })`.
+Constante compartida `src/lib/venezuela.ts` con los 24 estados + Distrito Capital y centroides aproximados (lat/lng) para el cálculo de cercanía.
 
-### 8. Tests
-`src/test/prestaciones.test.ts` con el ejemplo del usuario (2018-03-15 → 2024-07-31, Bs. 3000, tasa 18%) verificando capital = 40.000 y estructura.
+## Detalles técnicos
 
-### Archivos a crear
-- `supabase/migrations/<ts>_prestaciones.sql`
-- `src/lib/prestaciones.ts`
-- `src/components/PrestacionesAdminSection.tsx`
-- `src/pages/Prestaciones.tsx`
-- `src/test/prestaciones.test.ts`
+- **Foto**: subida desde el admin al bucket `lawyer-photos`, ruta `{user_id}/avatar.{ext}`, URL pública guardada en `profiles.photo_url`. Tamaño máximo 5MB, formatos JPG/PNG/WebP.
+- **Geolocalización**: si el usuario otorga permiso, calcular distancia haversine entre su lat/lng y el centroide de cada estado; auto-seleccionar el más cercano. Sin permiso → mostrar todos.
+- **WhatsApp**: normalizar a formato internacional (ej. `584141234567`) al guardar; el botón abre `https://wa.me/{whatsapp}`.
+- **Vista pública** `lawyers_directory`: `SECURITY INVOKER` con filtro `WHERE directory_enabled = true`, GRANT SELECT a `anon` y `authenticated`. Evita exponer toda la tabla `profiles`.
 
-### Archivos a modificar
-- `supabase/functions/admin-users/index.ts` (acción toggle_prestaciones)
-- `src/pages/AdminPanel.tsx` (columna + sección)
-- `src/hooks/useProfile.tsx` (campo)
-- `src/components/AppLayout.tsx` (nav link)
-- `src/App.tsx` (ruta)
-- `src/integrations/supabase/types.ts` (se regenera tras migración)
+## Archivos a crear/modificar
 
-### Confirmación
-¿Lo apruebas tal como está? Después de tu OK ejecuto la migración (requiere tu aprobación) y luego escribo todo el código.
+**Crear**: migración SQL, `src/pages/Directory.tsx`, `src/lib/venezuela.ts`, `src/components/EditLawyerDialog.tsx`.
+
+**Modificar**: `AdminPanel.tsx`, `Landing.tsx`, `App.tsx` (ruta), `useProfile.tsx`, `supabase/functions/admin-users/index.ts`, `types.ts`.
+
+¿Apruebas el plan para proceder con la implementación?
