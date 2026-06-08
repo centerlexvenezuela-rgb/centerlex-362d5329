@@ -234,6 +234,41 @@ const AdminPanel = () => {
               />
             </div>
             <div className="space-y-2">
+              <Label htmlFor="wa">WhatsApp <span className="text-muted-foreground">(opcional)</span></Label>
+              <Input
+                id="wa" type="text"
+                value={whatsapp} onChange={(e) => setWhatsapp(e.target.value)}
+                placeholder="584141234567"
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="ba">Colegio de abogados <span className="text-muted-foreground">(opcional)</span></Label>
+              <Input
+                id="ba" type="text"
+                value={bar} onChange={(e) => setBar(e.target.value)}
+                placeholder="Colegio de Abogados del Distrito Capital"
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="ci">Ciudad <span className="text-muted-foreground">(opcional)</span></Label>
+              <Input
+                id="ci" type="text"
+                value={city} onChange={(e) => setCity(e.target.value)}
+                placeholder="Caracas"
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="st">Estado <span className="text-muted-foreground">(opcional)</span></Label>
+              <Select value={stateField} onValueChange={setStateField}>
+                <SelectTrigger id="st"><SelectValue placeholder="Selecciona estado…" /></SelectTrigger>
+                <SelectContent>
+                  {VENEZUELA_STATES.map((s) => (
+                    <SelectItem key={s.name} value={s.name}>{s.name}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="space-y-2">
               <Label htmlFor="np">Contraseña inicial</Label>
               <Input
                 id="np" type="text" required minLength={6}
