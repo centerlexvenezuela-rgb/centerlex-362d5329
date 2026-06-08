@@ -88,6 +88,10 @@ const AdminPanel = () => {
         password,
         first_name: firstName.trim() || null,
         last_name: lastName.trim() || null,
+        whatsapp: whatsapp.replace(/\D/g, "") || null,
+        bar_association: bar.trim() || null,
+        city: city.trim() || null,
+        state: stateField || null,
       },
     });
     setCreating(false);
@@ -96,6 +100,7 @@ const AdminPanel = () => {
     }
     toast.success(`Cuenta creada para ${email}`);
     setEmail(""); setPassword(""); setFirstName(""); setLastName("");
+    setWhatsapp(""); setBar(""); setCity(""); setStateField("");
     load();
   };
 
