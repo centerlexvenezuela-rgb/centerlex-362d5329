@@ -377,13 +377,26 @@ const AdminPanel = () => {
                             </span>
                           </div>
                         </TableCell>
+                        <TableCell className="text-center">
+                          <div className="inline-flex items-center gap-2">
+                            <Switch
+                              checked={l.directory_enabled}
+                              disabled={togglingId === l.id}
+                              onCheckedChange={(v) => handleToggleDirectory(l.id, v)}
+                            />
+                            <span className="text-xs text-muted-foreground">
+                              {l.directory_enabled ? "Visible" : "Oculto"}
+                            </span>
+                          </div>
+                        </TableCell>
                         <TableCell className="text-right">
-                          <AlertDialog>
-                            <AlertDialogTrigger asChild>
-                              <Button variant="ghost" size="sm" className="text-destructive hover:text-destructive">
-                                <Trash2 className="h-4 w-4" />
-                              </Button>
-                            </AlertDialogTrigger>
+                          <Button
+                            variant="ghost" size="sm"
+                            onClick={() => setEditing(l)}
+                            title="Editar perfil"
+                          >
+                            <Pencil className="h-4 w-4" />
+                          </Button>
                             <AlertDialogContent>
                               <AlertDialogHeader>
                                 <AlertDialogTitle>¿Eliminar esta cuenta?</AlertDialogTitle>
