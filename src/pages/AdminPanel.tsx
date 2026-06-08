@@ -439,6 +439,15 @@ const AdminPanel = () => {
 
         <BackupSection />
       </main>
+
+      {editing && (
+        <EditLawyerDialog
+          open={!!editing}
+          onOpenChange={(o) => !o && setEditing(null)}
+          lawyer={editing}
+          onSaved={load}
+        />
+      )}
     </div>
   );
 };
