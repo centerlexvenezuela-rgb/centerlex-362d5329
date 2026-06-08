@@ -437,6 +437,7 @@ export type Database = {
           city: string | null
           created_at: string
           directory_enabled: boolean
+          email: string | null
           fees_enabled: boolean
           first_name: string | null
           google_connected_at: string | null
@@ -458,6 +459,7 @@ export type Database = {
           city?: string | null
           created_at?: string
           directory_enabled?: boolean
+          email?: string | null
           fees_enabled?: boolean
           first_name?: string | null
           google_connected_at?: string | null
@@ -479,6 +481,7 @@ export type Database = {
           city?: string | null
           created_at?: string
           directory_enabled?: boolean
+          email?: string | null
           fees_enabled?: boolean
           first_name?: string | null
           google_connected_at?: string | null
@@ -530,6 +533,28 @@ export type Database = {
           state: string | null
           user_id: string | null
           whatsapp: string | null
+        }
+        Insert: {
+          bar_association?: string | null
+          city?: string | null
+          email?: string | null
+          first_name?: string | null
+          last_name?: string | null
+          photo_url?: string | null
+          state?: string | null
+          user_id?: string | null
+          whatsapp?: string | null
+        }
+        Update: {
+          bar_association?: string | null
+          city?: string | null
+          email?: string | null
+          first_name?: string | null
+          last_name?: string | null
+          photo_url?: string | null
+          state?: string | null
+          user_id?: string | null
+          whatsapp?: string | null
         }
         Relationships: []
       }
