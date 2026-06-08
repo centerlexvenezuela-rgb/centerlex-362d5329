@@ -321,6 +321,11 @@ const AdminPanel = () => {
                         <Banknote className="h-3.5 w-3.5" /> Prestaciones
                       </span>
                     </TableHead>
+                    <TableHead className="text-center">
+                      <span className="inline-flex items-center gap-1">
+                        <UserSquare2 className="h-3.5 w-3.5" /> Directorio
+                      </span>
+                    </TableHead>
                     <TableHead className="text-right">Acciones</TableHead>
                   </TableRow>
                 </TableHeader>
