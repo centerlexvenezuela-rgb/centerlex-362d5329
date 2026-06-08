@@ -82,11 +82,16 @@ const Landing = () => {
               <p className="text-[10px] sm:text-xs text-muted-foreground">{branding.app_subtitle}</p>
             </div>
           </div>
-          <Button asChild variant="outline" size="sm">
-            <Link to="/auth">
-              <LogIn className="h-4 w-4 mr-1.5" /> {c.header_login_button}
-            </Link>
-          </Button>
+          <div className="flex items-center gap-2">
+            <Button asChild variant="ghost" size="sm" className="hidden sm:inline-flex">
+              <Link to="/directorio">Directorio</Link>
+            </Button>
+            <Button asChild variant="outline" size="sm">
+              <Link to="/auth">
+                <LogIn className="h-4 w-4 mr-1.5" /> {c.header_login_button}
+              </Link>
+            </Button>
+          </div>
         </div>
       </header>
 
