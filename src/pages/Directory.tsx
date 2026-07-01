@@ -8,7 +8,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
   Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
 } from "@/components/ui/select";
-import { Scale, MapPin, Mail, Phone, Search, Loader2, ArrowLeft, Locate } from "lucide-react";
+import { Scale, MapPin, Phone, Search, Loader2, ArrowLeft, Locate } from "lucide-react";
 import { VENEZUELA_STATES, nearestState } from "@/lib/venezuela";
 import { useBranding } from "@/hooks/useBranding";
 import { toast } from "sonner";
