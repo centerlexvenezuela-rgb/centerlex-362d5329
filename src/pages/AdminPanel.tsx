@@ -172,6 +172,22 @@ const AdminPanel = () => {
     toast.success(next ? "Abogado visible en el directorio" : "Abogado oculto del directorio");
   };
 
+  const handleToggleActive = async (id: string, active: boolean) => {
+    setTogglingId(id);
+    setLawyers((prev) => prev.map((l) => (l.id === id ? { ...l, banned: !active } : l)));
+    const { data, error } = await supabase.functions.invoke("admin-users", {
+      body: { action: "toggle_active", user_id: id, active },
+    });
+    setTogglingId(null);
+    if (error || data?.error) {
+      setLawyers((prev) => prev.map((l) => (l.id === id ? { ...l, banned: active } : l)));
+      return toast.error(error?.message ?? data?.error ?? "Error");
+    }
+    toast.success(active ? "Cuenta habilitada" : "Cuenta inhabilitada temporalmente");
+  };
+
+
+
 
   const handleSignOut = async () => {
     await signOut();
