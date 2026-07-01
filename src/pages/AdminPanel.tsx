@@ -35,6 +35,7 @@ interface Lawyer {
   email: string;
   created_at: string;
   role: string | null;
+  banned: boolean;
   first_name: string | null;
   last_name: string | null;
   ai_enabled: boolean;
