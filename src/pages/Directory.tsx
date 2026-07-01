@@ -217,13 +217,6 @@ const Directory = () => {
                         </a>
                       </Button>
                     )}
-                    {l.email && (
-                      <Button asChild variant="outline">
-                        <a href={`mailto:${l.email}`}>
-                          <Mail className="h-4 w-4 mr-2" /> Correo
-                        </a>
-                      </Button>
-                    )}
                   </div>
                 </Card>
               );
