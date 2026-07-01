@@ -206,6 +206,24 @@ Deno.serve(async (req) => {
       });
     }
 
+    if (action === "toggle_active") {
+      const { user_id, active } = body;
+      if (!user_id || typeof active !== "boolean") {
+        return new Response(JSON.stringify({ error: "Parámetros inválidos" }), {
+          status: 400,
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      }
+      const ban_duration = active ? "none" : "876000h";
+      const { error } = await admin.auth.admin.updateUserById(user_id, {
+        ban_duration,
+      } as any);
+      if (error) throw error;
+      return new Response(JSON.stringify({ ok: true }), {
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
     if (action === "delete") {
       const { user_id } = body;
       if (!user_id) {
