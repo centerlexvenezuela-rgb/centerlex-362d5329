@@ -67,10 +67,13 @@ Deno.serve(async (req) => {
         .map((u) => {
           const r = roles?.find((x) => x.user_id === u.id);
           const p = profiles?.find((x) => x.user_id === u.id) as any;
+          const bannedUntil = (u as any).banned_until as string | null | undefined;
+          const isBanned = !!bannedUntil && new Date(bannedUntil).getTime() > Date.now();
           return {
             id: u.id,
             email: u.email,
             created_at: u.created_at,
+            banned: isBanned,
             role: r?.role ?? null,
             first_name: p?.first_name ?? null,
             last_name: p?.last_name ?? null,
