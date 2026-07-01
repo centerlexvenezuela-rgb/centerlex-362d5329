@@ -18,7 +18,7 @@ import {
   AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
-import { ShieldCheck, UserPlus, Trash2, LogOut, Loader2, Sparkles, Calculator, Banknote, Pencil, UserSquare2 } from "lucide-react";
+import { ShieldCheck, UserPlus, Trash2, LogOut, Loader2, Sparkles, Calculator, Banknote, Pencil, UserSquare2, Power } from "lucide-react";
 import { BrandingSection } from "@/components/BrandingSection";
 import { LandingContentSection } from "@/components/LandingContentSection";
 import { ContactMessagesSection } from "@/components/ContactMessagesSection";
@@ -35,6 +35,7 @@ interface Lawyer {
   email: string;
   created_at: string;
   role: string | null;
+  banned: boolean;
   first_name: string | null;
   last_name: string | null;
   ai_enabled: boolean;
@@ -170,6 +171,22 @@ const AdminPanel = () => {
     }
     toast.success(next ? "Abogado visible en el directorio" : "Abogado oculto del directorio");
   };
+
+  const handleToggleActive = async (id: string, active: boolean) => {
+    setTogglingId(id);
+    setLawyers((prev) => prev.map((l) => (l.id === id ? { ...l, banned: !active } : l)));
+    const { data, error } = await supabase.functions.invoke("admin-users", {
+      body: { action: "toggle_active", user_id: id, active },
+    });
+    setTogglingId(null);
+    if (error || data?.error) {
+      setLawyers((prev) => prev.map((l) => (l.id === id ? { ...l, banned: active } : l)));
+      return toast.error(error?.message ?? data?.error ?? "Error");
+    }
+    toast.success(active ? "Cuenta habilitada" : "Cuenta inhabilitada temporalmente");
+  };
+
+
 
 
   const handleSignOut = async () => {
@@ -308,6 +325,11 @@ const AdminPanel = () => {
                     <TableHead>Fecha</TableHead>
                     <TableHead className="text-center">
                       <span className="inline-flex items-center gap-1">
+                        <Power className="h-3.5 w-3.5" /> Cuenta
+                      </span>
+                    </TableHead>
+                    <TableHead className="text-center">
+                      <span className="inline-flex items-center gap-1">
                         <Sparkles className="h-3.5 w-3.5" /> Asistente IA
                       </span>
                     </TableHead>
@@ -340,6 +362,18 @@ const AdminPanel = () => {
                         <TableCell>{l.email}</TableCell>
                         <TableCell className="text-muted-foreground">
                           {new Date(l.created_at).toLocaleDateString("es-ES")}
+                        </TableCell>
+                        <TableCell className="text-center">
+                          <div className="inline-flex items-center gap-2">
+                            <Switch
+                              checked={!l.banned}
+                              disabled={togglingId === l.id}
+                              onCheckedChange={(v) => handleToggleActive(l.id, v)}
+                            />
+                            <span className={`text-xs ${l.banned ? "text-destructive font-medium" : "text-muted-foreground"}`}>
+                              {l.banned ? "Inhabilitada" : "Habilitada"}
+                            </span>
+                          </div>
                         </TableCell>
                         <TableCell className="text-center">
                           <div className="inline-flex items-center gap-2">

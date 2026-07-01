@@ -8,7 +8,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
   Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
 } from "@/components/ui/select";
-import { Scale, MapPin, Mail, Phone, Search, Loader2, ArrowLeft, Locate } from "lucide-react";
+import { Scale, MapPin, Phone, Search, Loader2, ArrowLeft, Locate } from "lucide-react";
 import { VENEZUELA_STATES, nearestState } from "@/lib/venezuela";
 import { useBranding } from "@/hooks/useBranding";
 import { toast } from "sonner";
@@ -214,13 +214,6 @@ const Directory = () => {
                       <Button asChild className="bg-[#25D366] hover:bg-[#1ebe5d] text-white">
                         <a href={`https://wa.me/${wa}`} target="_blank" rel="noopener noreferrer">
                           <Phone className="h-4 w-4 mr-2" /> WhatsApp
-                        </a>
-                      </Button>
-                    )}
-                    {l.email && (
-                      <Button asChild variant="outline">
-                        <a href={`mailto:${l.email}`}>
-                          <Mail className="h-4 w-4 mr-2" /> Correo
                         </a>
                       </Button>
                     )}

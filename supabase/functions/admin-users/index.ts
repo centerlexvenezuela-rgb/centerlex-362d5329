@@ -67,10 +67,13 @@ Deno.serve(async (req) => {
         .map((u) => {
           const r = roles?.find((x) => x.user_id === u.id);
           const p = profiles?.find((x) => x.user_id === u.id) as any;
+          const bannedUntil = (u as any).banned_until as string | null | undefined;
+          const isBanned = !!bannedUntil && new Date(bannedUntil).getTime() > Date.now();
           return {
             id: u.id,
             email: u.email,
             created_at: u.created_at,
+            banned: isBanned,
             role: r?.role ?? null,
             first_name: p?.first_name ?? null,
             last_name: p?.last_name ?? null,
@@ -198,6 +201,24 @@ Deno.serve(async (req) => {
           .insert({ user_id, [field]: value });
         if (error) throw error;
       }
+      return new Response(JSON.stringify({ ok: true }), {
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
+    if (action === "toggle_active") {
+      const { user_id, active } = body;
+      if (!user_id || typeof active !== "boolean") {
+        return new Response(JSON.stringify({ error: "Parámetros inválidos" }), {
+          status: 400,
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      }
+      const ban_duration = active ? "none" : "876000h";
+      const { error } = await admin.auth.admin.updateUserById(user_id, {
+        ban_duration,
+      } as any);
+      if (error) throw error;
       return new Response(JSON.stringify({ ok: true }), {
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
