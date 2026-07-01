@@ -366,6 +366,18 @@ const AdminPanel = () => {
                         <TableCell className="text-center">
                           <div className="inline-flex items-center gap-2">
                             <Switch
+                              checked={!l.banned}
+                              disabled={togglingId === l.id}
+                              onCheckedChange={(v) => handleToggleActive(l.id, v)}
+                            />
+                            <span className={`text-xs ${l.banned ? "text-destructive font-medium" : "text-muted-foreground"}`}>
+                              {l.banned ? "Inhabilitada" : "Habilitada"}
+                            </span>
+                          </div>
+                        </TableCell>
+                        <TableCell className="text-center">
+                          <div className="inline-flex items-center gap-2">
+                            <Switch
                               checked={l.ai_enabled}
                               disabled={togglingId === l.id}
                               onCheckedChange={(v) => handleToggleAI(l.id, v)}
