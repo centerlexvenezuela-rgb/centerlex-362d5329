@@ -325,6 +325,11 @@ const AdminPanel = () => {
                     <TableHead>Fecha</TableHead>
                     <TableHead className="text-center">
                       <span className="inline-flex items-center gap-1">
+                        <Power className="h-3.5 w-3.5" /> Cuenta
+                      </span>
+                    </TableHead>
+                    <TableHead className="text-center">
+                      <span className="inline-flex items-center gap-1">
                         <Sparkles className="h-3.5 w-3.5" /> Asistente IA
                       </span>
                     </TableHead>
