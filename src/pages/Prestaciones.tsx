@@ -10,7 +10,7 @@ import {
   Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
 } from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
-import { Scale, Loader2, Calculator, Printer } from "lucide-react";
+import { Scale, Loader2, Calculator, Printer, Plus, Trash2, Trophy, Info } from "lucide-react";
 import {
   calcularPrestaciones,
   formatBs,
@@ -18,6 +18,7 @@ import {
   type MotivoTerminacion,
   type PrestacionesResultado,
   type PrestacionesSettings,
+  type SalarioPeriodo,
   type TasaMensual,
 } from "@/lib/prestaciones";
 import { toast } from "sonner";
@@ -28,11 +29,16 @@ const Prestaciones = () => {
   const [tasas, setTasas] = useState<TasaMensual[]>([]);
   const [loading, setLoading] = useState(true);
 
-  // form
+  // Formulario
   const [trabajador, setTrabajador] = useState("");
   const [fechaInicio, setFechaInicio] = useState("");
   const [fechaFin, setFechaFin] = useState("");
-  const [salario, setSalario] = useState("");
+  const [salarios, setSalarios] = useState<SalarioPeriodo[]>([
+    { desde: "", salario_base: 0, otros_bonos: 0 },
+  ]);
+  const [diasUtilidades, setDiasUtilidades] = useState("30");
+  const [diasBVBase, setDiasBVBase] = useState("15");
+  const [incrementoBV, setIncrementoBV] = useState("1");
   const [motivo, setMotivo] = useState<MotivoTerminacion>("despido_injustificado");
   const [eligeIndemnizacion, setEligeIndemnizacion] = useState(true);
   const [anticipos, setAnticipos] = useState("");
@@ -78,17 +84,34 @@ const Prestaciones = () => {
     return <Card className="p-6">No se pudieron cargar los parámetros.</Card>;
   }
 
+  const addSalario = () =>
+    setSalarios((xs) => [...xs, { desde: "", salario_base: 0, otros_bonos: 0 }]);
+  const removeSalario = (i: number) =>
+    setSalarios((xs) => xs.filter((_, k) => k !== i));
+  const setSal = (i: number, patch: Partial<SalarioPeriodo>) =>
+    setSalarios((xs) => xs.map((s, k) => (k === i ? { ...s, ...patch } : s)));
+
   const onCalcular = () => {
     try {
       if (!fechaInicio || !fechaFin) return toast.error("Indique las fechas");
-      const s = parseFloat(salario.replace(",", "."));
-      if (!s || s <= 0) return toast.error("Salario inválido");
+      const sals = salarios
+        .filter((s) => s.desde && s.salario_base > 0)
+        .map((s) => ({
+          desde: s.desde,
+          salario_base: Number(s.salario_base),
+          otros_bonos: Number(s.otros_bonos ?? 0),
+        }));
+      if (!sals.length) return toast.error("Agregue al menos un salario válido");
+
       const a = anticipos ? parseFloat(anticipos.replace(",", ".")) : 0;
       const r = calcularPrestaciones(
         {
           fecha_inicio: new Date(fechaInicio + "T00:00:00"),
           fecha_fin: new Date(fechaFin + "T00:00:00"),
-          salario_mensual_integral: s,
+          salarios: sals,
+          dias_utilidades: parseInt(diasUtilidades) || 30,
+          dias_bono_vacacional_base: parseInt(diasBVBase) || 15,
+          incremento_bono_vacacional_anual: parseInt(incrementoBV) || 1,
           motivo_terminacion: motivo,
           elige_indemnizacion: eligeIndemnizacion,
           anticipos: a,
@@ -110,11 +133,13 @@ const Prestaciones = () => {
           <h1 className="font-serif text-3xl">Calculadora de Prestaciones Sociales</h1>
         </div>
         <p className="text-muted-foreground">
-          Cálculo conforme a la Ley Orgánica del Trabajo, los Trabajadores y las Trabajadoras (LOTTT), artículos 142, 143 y 92.
+          Sistema dual obligatorio conforme al artículo 142 LOTTT. Calcula acumulativo (a+b+intereses)
+          y retroactivo (c+b) y aplica la Regla de Oro (literal d).
         </p>
       </div>
 
-      <div className="grid gap-6 md:grid-cols-2">
+      <div className="grid gap-6 lg:grid-cols-2">
+        {/* Formulario */}
         <Card className="p-6 shadow-card space-y-4 print:hidden">
           <h2 className="font-serif text-lg flex items-center gap-2">
             <Calculator className="h-5 w-5 text-accent" /> Datos del trabajador
@@ -136,18 +161,84 @@ const Prestaciones = () => {
             </div>
           </div>
 
-          <div className="space-y-2">
-            <Label>Último salario mensual integral (Bs.)</Label>
-            <Input
-              type="number"
-              step="0.01"
-              value={salario}
-              onChange={(e) => setSalario(e.target.value)}
-              placeholder="Ej: 3000.00"
-            />
+          <div className="space-y-3 rounded border p-3">
+            <div className="flex items-center justify-between">
+              <Label className="text-sm font-semibold">Salarios (base + bonos permanentes)</Label>
+              <Button variant="outline" size="sm" onClick={addSalario}>
+                <Plus className="h-4 w-4 mr-1" /> Período
+              </Button>
+            </div>
             <p className="text-xs text-muted-foreground">
-              Incluya sueldo base + alícuotas de utilidades, bono vacacional y demás percepciones salariales.
+              Añada un período por cada cambio de salario. Los "otros bonos" deben ser pagos continuos
+              y permanentes que forman parte del salario.
             </p>
+            {salarios.map((s, i) => (
+              <div key={i} className="grid gap-2 md:grid-cols-[1fr_1fr_1fr_auto] items-end">
+                <div className="space-y-1">
+                  <Label className="text-xs">Desde</Label>
+                  <Input
+                    type="date"
+                    value={s.desde}
+                    onChange={(e) => setSal(i, { desde: e.target.value })}
+                  />
+                </div>
+                <div className="space-y-1">
+                  <Label className="text-xs">Salario base (Bs.)</Label>
+                  <Input
+                    type="number"
+                    step="0.01"
+                    value={s.salario_base || ""}
+                    onChange={(e) => setSal(i, { salario_base: parseFloat(e.target.value) || 0 })}
+                  />
+                </div>
+                <div className="space-y-1">
+                  <Label className="text-xs">Otros bonos (Bs.)</Label>
+                  <Input
+                    type="number"
+                    step="0.01"
+                    value={s.otros_bonos || ""}
+                    onChange={(e) => setSal(i, { otros_bonos: parseFloat(e.target.value) || 0 })}
+                  />
+                </div>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={() => removeSalario(i)}
+                  disabled={salarios.length === 1}
+                >
+                  <Trash2 className="h-4 w-4" />
+                </Button>
+              </div>
+            ))}
+          </div>
+
+          <div className="grid gap-3 md:grid-cols-3">
+            <div className="space-y-2">
+              <Label>Días utilidades / año</Label>
+              <Input
+                type="number"
+                min={15}
+                max={120}
+                value={diasUtilidades}
+                onChange={(e) => setDiasUtilidades(e.target.value)}
+              />
+            </div>
+            <div className="space-y-2">
+              <Label>Bono vacacional base</Label>
+              <Input
+                type="number"
+                value={diasBVBase}
+                onChange={(e) => setDiasBVBase(e.target.value)}
+              />
+            </div>
+            <div className="space-y-2">
+              <Label>+ días BV por año</Label>
+              <Input
+                type="number"
+                value={incrementoBV}
+                onChange={(e) => setIncrementoBV(e.target.value)}
+              />
+            </div>
           </div>
 
           <div className="space-y-2">
@@ -165,8 +256,10 @@ const Prestaciones = () => {
           {motivo === "despido_injustificado" && (
             <div className="flex items-center justify-between rounded border p-3 bg-muted/30">
               <div>
-                <p className="text-sm font-medium">El trabajador elige indemnización (art. 92)</p>
-                <p className="text-xs text-muted-foreground">Se duplican las prestaciones sociales.</p>
+                <p className="text-sm font-medium">Indemnización art. 92 (doblete)</p>
+                <p className="text-xs text-muted-foreground">
+                  El patrono paga el doble de las prestaciones sociales.
+                </p>
               </div>
               <Switch checked={eligeIndemnizacion} onCheckedChange={setEligeIndemnizacion} />
             </div>
@@ -188,6 +281,7 @@ const Prestaciones = () => {
           </Button>
         </Card>
 
+        {/* Resultado */}
         <Card className="p-6 shadow-card">
           {!resultado ? (
             <div className="h-full flex items-center justify-center text-center text-muted-foreground py-16">
@@ -209,39 +303,146 @@ const Prestaciones = () => {
                 </Button>
               </div>
 
+              {/* Regla de Oro */}
+              <div className="rounded-lg border-2 border-accent/50 bg-accent/5 p-4">
+                <div className="flex items-center gap-2 mb-2">
+                  <Trophy className="h-5 w-5 text-accent" />
+                  <h3 className="font-serif text-base">Regla de Oro (art. 142 lit. d)</h3>
+                </div>
+                <p className="text-sm">
+                  Sistema más favorable al trabajador:{" "}
+                  <strong className="text-accent uppercase">
+                    {resultado.sistema_favorable === "acumulativo"
+                      ? "Acumulativo (a + b + intereses)"
+                      : "Retroactivo (c + b)"}
+                  </strong>
+                </p>
+                <div className="grid grid-cols-2 gap-2 mt-3 text-sm">
+                  <div className={`rounded border p-2 ${resultado.sistema_favorable === "acumulativo" ? "border-accent bg-accent/10" : ""}`}>
+                    <p className="text-xs text-muted-foreground">Acumulativo</p>
+                    <p className="font-semibold">{formatBs(resultado.acumulativo.total)}</p>
+                  </div>
+                  <div className={`rounded border p-2 ${resultado.sistema_favorable === "retroactivo" ? "border-accent bg-accent/10" : ""}`}>
+                    <p className="text-xs text-muted-foreground">Retroactivo</p>
+                    <p className="font-semibold">{formatBs(resultado.retroactivo.total)}</p>
+                  </div>
+                </div>
+              </div>
+
+              {/* Antigüedad y último salario */}
               <div className="rounded-lg border p-4 space-y-2 text-sm">
-                <h3 className="font-serif text-base mb-2">Tiempo de servicio</h3>
-                <Row label="Días totales" value={String(resultado.dias_totales)} />
-                <Row label="Meses" value={String(resultado.meses)} />
-                <Row label="Trimestres" value={String(resultado.trimestres)} />
+                <h3 className="font-serif text-base mb-2">Antigüedad y último salario integral</h3>
+                <Row label="Días totales de servicio" value={String(resultado.dias_totales)} />
                 <Row label="Años completos" value={String(resultado.anios_completos)} />
+                <Row label="Último salario base" value={formatBs(resultado.ultimo_salario_base)} />
+                {resultado.ultimo_otros_bonos > 0 && (
+                  <Row label="Otros bonos permanentes" value={formatBs(resultado.ultimo_otros_bonos)} />
+                )}
+                <Row label="Días bono vacacional (último año)" value={String(resultado.ultimo_dias_bono_vacacional)} />
+                <Row label="Salario integral diario" value={formatBs(resultado.ultimo_salario_integral_diario)} />
+                <Row label="Salario integral mensual" value={formatBs(resultado.ultimo_salario_integral_mensual)} bold />
               </div>
 
+              {/* Sistema Acumulativo */}
               <div className="rounded-lg border p-4 space-y-2 text-sm">
-                <h3 className="font-serif text-base mb-2">Capital de antigüedad (art. 142)</h3>
-                <Row label="Salario diario integral" value={formatBs(resultado.salario_diario)} />
-                <Row label={`Días de antigüedad (${settings.dias_por_trimestre} × ${resultado.trimestres})`} value={String(resultado.dias_antiguedad)} />
-                <Row label="Días adicionales" value={String(resultado.dias_adicionales)} />
-                <Row label="Total días" value={String(resultado.total_dias)} />
-                <Row label="Capital" value={formatBs(resultado.capital)} bold />
+                <h3 className="font-serif text-base mb-2">
+                  Sistema Acumulativo (literales a + b + intereses)
+                </h3>
+                <Row
+                  label={`Literal a — ${resultado.acumulativo.trimestres.length} trimestres × ${settings.dias_por_trimestre} días`}
+                  value={formatBs(resultado.acumulativo.total_literal_a)}
+                />
+                <Row
+                  label={`Literal b — ${resultado.acumulativo.dias_adicionales} días adicionales`}
+                  value={formatBs(resultado.acumulativo.literal_b)}
+                />
+                <Row
+                  label="Intereses (art. 143, capitalización mensual BCV)"
+                  value={formatBs(resultado.acumulativo.intereses)}
+                />
+                <div className="border-t pt-2 mt-2">
+                  <Row label="Total Acumulativo" value={formatBs(resultado.acumulativo.total)} bold />
+                </div>
+                {resultado.acumulativo.trimestres.length > 0 && (
+                  <details className="mt-2">
+                    <summary className="cursor-pointer text-xs text-accent">
+                      Ver desglose por trimestre
+                    </summary>
+                    <div className="mt-2 max-h-64 overflow-auto text-xs">
+                      <table className="w-full">
+                        <thead className="text-left text-muted-foreground">
+                          <tr>
+                            <th className="pr-2">#</th>
+                            <th className="pr-2">Cierra</th>
+                            <th className="pr-2">Sal. integral/día</th>
+                            <th className="text-right">Aporte</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {resultado.acumulativo.trimestres.map((t) => (
+                            <tr key={t.n} className="border-t">
+                              <td className="pr-2 py-1">{t.n}</td>
+                              <td className="pr-2 py-1">{t.hasta.toLocaleDateString("es-VE")}</td>
+                              <td className="pr-2 py-1">{formatBs(t.salario_integral_diario)}</td>
+                              <td className="text-right py-1">{formatBs(t.aporte)}</td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
+                  </details>
+                )}
               </div>
 
+              {/* Sistema Retroactivo */}
               <div className="rounded-lg border p-4 space-y-2 text-sm">
-                <h3 className="font-serif text-base mb-2">Intereses (art. 143)</h3>
-                <Row label={`Flujos considerados`} value={String(resultado.flujos.length)} />
-                <Row label="Intereses acumulados" value={formatBs(resultado.intereses)} bold />
+                <h3 className="font-serif text-base mb-2">
+                  Sistema Retroactivo (literal c + b)
+                </h3>
+                <Row label="Años completos" value={String(resultado.retroactivo.anios_completos)} />
+                <Row
+                  label={`Fracción (${resultado.retroactivo.fraccion_meses} meses)`}
+                  value={resultado.retroactivo.computa_fraccion ? "computa (≥6 meses)" : "no computa"}
+                />
+                <Row label="Años computados" value={String(resultado.retroactivo.anios_computados)} />
+                <Row
+                  label={`Literal c — ${resultado.retroactivo.dias_literal_c} días × último sal. integral`}
+                  value={formatBs(resultado.retroactivo.literal_c)}
+                />
+                <Row
+                  label={`Literal b — ${resultado.retroactivo.dias_adicionales} días adicionales`}
+                  value={formatBs(resultado.retroactivo.literal_b)}
+                />
+                <div className="border-t pt-2 mt-2">
+                  <Row label="Total Retroactivo" value={formatBs(resultado.retroactivo.total)} bold />
+                </div>
               </div>
 
+              {/* Liquidación */}
               <div className="rounded-lg border p-4 space-y-2 text-sm">
-                <h3 className="font-serif text-base mb-2">Resumen</h3>
-                <Row label="Total prestaciones (capital + intereses)" value={formatBs(resultado.total_prestaciones)} />
-                <Row label="Indemnización por despido (art. 92)" value={formatBs(resultado.indemnizacion_despido)} />
+                <h3 className="font-serif text-base mb-2">Liquidación</h3>
+                <Row label="Prestaciones (sistema favorable)" value={formatBs(resultado.monto_favorable)} />
+                {resultado.indemnizacion_despido > 0 && (
+                  <Row
+                    label="Indemnización art. 92 (doblete)"
+                    value={formatBs(resultado.indemnizacion_despido)}
+                  />
+                )}
                 {resultado.anticipos > 0 && (
                   <Row label="(−) Anticipos" value={formatBs(resultado.anticipos)} />
                 )}
                 <div className="border-t pt-2 mt-2">
                   <Row label="TOTAL A PAGAR" value={formatBs(resultado.total_pagar)} bold />
                 </div>
+              </div>
+
+              <div className="rounded border border-muted p-3 text-xs text-muted-foreground flex gap-2">
+                <Info className="h-4 w-4 shrink-0 mt-0.5" />
+                <span>
+                  Cálculo estimado conforme al art. 142 LOTTT. Debe ser verificado por un profesional.
+                  El pago debe realizarse dentro de los 5 días siguientes a la terminación
+                  (art. 142 lit. f); su incumplimiento genera intereses de mora a la tasa activa BCV.
+                </span>
               </div>
             </div>
           )}
