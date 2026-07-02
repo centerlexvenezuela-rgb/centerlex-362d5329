@@ -215,10 +215,24 @@ Deno.serve(async (req) => {
         });
       }
       const ban_duration = active ? "none" : "876000h";
-      const { error } = await admin.auth.admin.updateUserById(user_id, {
-        ban_duration,
-      } as any);
-      if (error) throw error;
+      // Use GoTrue admin REST directly to guarantee ban_duration is honored
+      const resp = await fetch(`${SUPABASE_URL}/auth/v1/admin/users/${user_id}`, {
+        method: "PUT",
+        headers: {
+          apikey: SERVICE_ROLE,
+          Authorization: `Bearer ${SERVICE_ROLE}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ ban_duration }),
+      });
+      const text = await resp.text();
+      if (!resp.ok) {
+        console.error("toggle_active failed", resp.status, text);
+        return new Response(
+          JSON.stringify({ error: `No se pudo actualizar la cuenta: ${text}` }),
+          { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } },
+        );
+      }
       return new Response(JSON.stringify({ ok: true }), {
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
