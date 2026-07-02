@@ -26,11 +26,12 @@ describe("calcularPrestaciones (LOTTT art. 142, sistema dual)", () => {
       DEFAULT_SETTINGS,
     );
 
-    // 6 años completos
-    expect(r.anios_completos).toBe(6);
-    // literal b = (6-1)*2 = 10 días
-    expect(r.acumulativo.dias_adicionales).toBe(10);
-    // retroactivo = 6 años × 30 días
+    // 5 años 11 meses (aún no llega al 6to año exacto)
+    expect(r.anios_completos).toBe(5);
+    // literal b = (5-1)*2 = 8 días
+    expect(r.acumulativo.dias_adicionales).toBe(8);
+    // retroactivo: 5 años + fracción (11 meses ≥ 6) = 6 años × 30 días
+    expect(r.retroactivo.anios_computados).toBe(6);
     expect(r.retroactivo.dias_literal_c).toBe(180);
     // sistema favorable definido
     expect(["acumulativo", "retroactivo"]).toContain(r.sistema_favorable);
