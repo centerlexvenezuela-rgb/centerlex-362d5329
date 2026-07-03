@@ -225,9 +225,11 @@ export type Database = {
           content: string | null
           created_at: string
           drive_file_id: string | null
+          event_date: string | null
           file_name: string | null
           id: string
           kind: string
+          metadata: Json
           mime_type: string | null
           size_bytes: number | null
           title: string
@@ -239,9 +241,11 @@ export type Database = {
           content?: string | null
           created_at?: string
           drive_file_id?: string | null
+          event_date?: string | null
           file_name?: string | null
           id?: string
           kind?: string
+          metadata?: Json
           mime_type?: string | null
           size_bytes?: number | null
           title: string
@@ -253,9 +257,11 @@ export type Database = {
           content?: string | null
           created_at?: string
           drive_file_id?: string | null
+          event_date?: string | null
           file_name?: string | null
           id?: string
           kind?: string
+          metadata?: Json
           mime_type?: string | null
           size_bytes?: number | null
           title?: string
