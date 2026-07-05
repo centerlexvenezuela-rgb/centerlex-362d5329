@@ -232,13 +232,102 @@ const Prestaciones = () => {
               />
             </div>
             <div className="space-y-2">
-              <Label>+ días BV por año</Label>
+              <Label>Incremento anual del bono vacacional (días)</Label>
               <Input
                 type="number"
                 value={incrementoBV}
                 onChange={(e) => setIncrementoBV(e.target.value)}
               />
+              <p className="text-[11px] text-muted-foreground leading-snug">
+                Días adicionales de bono vacacional que se suman por cada año de
+                antigüedad después del primero (art. 192 LOTTT: mínimo 1 día/año,
+                tope 30). Ej.: base 15 + 1 día/año ⇒ 2º año = 16, 3º = 17…
+              </p>
             </div>
+          </div>
+
+          {/* Tasas BCV editables por el abogado */}
+          <div className="space-y-3 rounded border p-3">
+            <div className="flex items-center justify-between flex-wrap gap-2">
+              <div>
+                <Label className="text-sm font-semibold">
+                  Tasas de interés BCV (art. 143)
+                </Label>
+                <p className="text-xs text-muted-foreground mt-1">
+                  Tasa anual promedio activa-pasiva publicada por el BCV para cada
+                  mes del período. Si un mes no está registrado, se aplica la tasa
+                  por defecto ({settings.tasa_interes_anual_default}%).
+                </p>
+              </div>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() =>
+                  setTasas((xs) => [{ mes: "", tasa_anual_porcentaje: 0 }, ...xs])
+                }
+              >
+                <Plus className="h-4 w-4 mr-1" /> Tasa mensual
+              </Button>
+            </div>
+            {tasas.length === 0 ? (
+              <p className="text-xs text-muted-foreground text-center py-2">
+                No hay tasas cargadas. Añada al menos una para el período.
+              </p>
+            ) : (
+              <div className="max-h-56 overflow-y-auto space-y-2">
+                {tasas.map((t, i) => (
+                  <div
+                    key={i}
+                    className="grid gap-2 md:grid-cols-[1fr_1fr_auto] items-end"
+                  >
+                    <div className="space-y-1">
+                      <Label className="text-xs">Mes</Label>
+                      <Input
+                        type="month"
+                        value={t.mes}
+                        onChange={(e) =>
+                          setTasas((xs) =>
+                            xs.map((x, k) =>
+                              k === i ? { ...x, mes: e.target.value } : x,
+                            ),
+                          )
+                        }
+                      />
+                    </div>
+                    <div className="space-y-1">
+                      <Label className="text-xs">Tasa anual (%)</Label>
+                      <Input
+                        type="number"
+                        step="0.001"
+                        value={t.tasa_anual_porcentaje || ""}
+                        onChange={(e) =>
+                          setTasas((xs) =>
+                            xs.map((x, k) =>
+                              k === i
+                                ? {
+                                    ...x,
+                                    tasa_anual_porcentaje:
+                                      parseFloat(e.target.value) || 0,
+                                  }
+                                : x,
+                            ),
+                          )
+                        }
+                      />
+                    </div>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      onClick={() =>
+                        setTasas((xs) => xs.filter((_, k) => k !== i))
+                      }
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </Button>
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
 
           <div className="space-y-2">
