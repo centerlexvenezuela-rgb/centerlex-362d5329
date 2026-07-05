@@ -86,6 +86,11 @@
 
 @layer base {
   * { @apply border-border; }
+  html, body {
+    /* Evita scroll horizontal en móviles (<360px) si algún hijo excede el ancho */
+    overflow-x: hidden;
+    max-width: 100vw;
+  }
   body {
     @apply bg-background text-foreground antialiased;
     font-family: 'Inter', system-ui, sans-serif;
@@ -94,6 +99,26 @@
     font-family: 'Cormorant Garamond', Georgia, serif;
     letter-spacing: -0.01em;
   }
+  /* Palabras/URLs muy largas se cortan en vez de forzar overflow */
+  p, span, div, td, th, li, a, h1, h2, h3, h4, h5, h6 {
+    overflow-wrap: anywhere;
+  }
+}
+
+/* Reajustes responsivos: en pantallas angostas los encabezados y grupos de
+   botones pasan a distribución vertical en vez de generar scroll lateral. */
+@media (max-width: 480px) {
+  .flex.items-center.justify-between {
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+  /* Reduce padding grande de tarjetas y contenedores en móvil */
+  .p-6 { padding: 1rem !important; }
+  .px-6 { padding-left: 1rem !important; padding-right: 1rem !important; }
+  .py-8 { padding-top: 1.25rem !important; padding-bottom: 1.25rem !important; }
+  /* Tablas dentro de overflow-x-auto conservan scroll interno,
+     pero nunca desbordan el viewport */
+  .overflow-x-auto { max-width: 100%; }
 }
 
 /* TipTap editor */
