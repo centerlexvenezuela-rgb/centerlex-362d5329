@@ -250,7 +250,12 @@ const Landing = () => {
       {/* Footer */}
       <footer className="border-t bg-card">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 py-6 text-center text-xs text-muted-foreground">
-          {t(c.footer_text)}
+          <div>{t(c.footer_text)}</div>
+          <div className="mt-1.5 flex items-center justify-center gap-3 text-[11px]">
+            <Link to="/privacidad" className="hover:text-accent transition-colors">Política de privacidad</Link>
+            <span className="opacity-40">·</span>
+            <Link to="/terminos" className="hover:text-accent transition-colors">Términos y condiciones</Link>
+          </div>
         </div>
       </footer>
     </div>

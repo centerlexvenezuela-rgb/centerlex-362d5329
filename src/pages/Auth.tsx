@@ -78,9 +78,14 @@ const Auth = () => {
             Acceso exclusivo para abogados autorizados por la administración del despacho.
           </p>
         </div>
-        <p className="relative text-xs text-primary-foreground/50">
-          © {new Date().getFullYear()} {branding.app_title}
-        </p>
+        <div className="relative text-xs text-primary-foreground/50">
+          <div>© {new Date().getFullYear()} {branding.app_title}</div>
+          <div className="mt-1 flex items-center gap-3 text-[11px]">
+            <Link to="/privacidad" className="hover:text-accent transition-colors">Política de privacidad</Link>
+            <span className="opacity-40">·</span>
+            <Link to="/terminos" className="hover:text-accent transition-colors">Términos y condiciones</Link>
+          </div>
+        </div>
       </div>
 
       <div className="flex items-center justify-center p-6">
