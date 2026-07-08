@@ -24,6 +24,8 @@ import Fees from "./pages/Fees";
 import Prestaciones from "./pages/Prestaciones";
 import Directory from "./pages/Directory";
 import NotFound from "./pages/NotFound.tsx";
+import Privacy from "./pages/Privacy";
+import Terms from "./pages/Terms";
 
 const queryClient = new QueryClient();
 
@@ -39,6 +41,8 @@ const App = () => (
           <Routes>
             <Route path="/" element={<Landing />} />
             <Route path="/directorio" element={<Directory />} />
+            <Route path="/privacidad" element={<Privacy />} />
+            <Route path="/terminos" element={<Terms />} />
             <Route path="/auth" element={<Auth />} />
             <Route path="/admin/login" element={<AdminAuth />} />
             <Route
