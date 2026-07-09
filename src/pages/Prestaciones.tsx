@@ -41,7 +41,20 @@ const Prestaciones = () => {
   const [motivo, setMotivo] = useState<MotivoTerminacion>("despido_injustificado");
   const [eligeIndemnizacion, setEligeIndemnizacion] = useState(true);
   const [anticipos, setAnticipos] = useState("");
+  const [tasaUSD, setTasaUSD] = useState<string>("");
   const [resultado, setResultado] = useState<PrestacionesResultado | null>(null);
+
+  const tasaUSDNum = parseFloat((tasaUSD || "").replace(",", ".")) || 0;
+  const formatUSD = (n: number) =>
+    new Intl.NumberFormat("en-US", {
+      style: "currency",
+      currency: "USD",
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
+    }).format(Number.isFinite(n) ? n : 0);
+  const toUSD = (bs: number) => (tasaUSDNum > 0 ? bs / tasaUSDNum : 0);
+  const dual = (bs: number) =>
+    tasaUSDNum > 0 ? `${formatBs(bs)} · ${formatUSD(toUSD(bs))}` : formatBs(bs);
 
   useEffect(() => {
     const load = async () => {
@@ -336,6 +349,23 @@ const Prestaciones = () => {
             />
           </div>
 
+          <div className="space-y-2">
+            <Label>Tasa de cambio del dólar (Bs. por USD)</Label>
+            <Input
+              type="number"
+              step="0.0001"
+              value={tasaUSD}
+              onChange={(e) => setTasaUSD(e.target.value)}
+              placeholder="Ej: 145.50"
+            />
+            <p className="text-[11px] text-muted-foreground leading-snug">
+              Introduzca la tasa de cambio oficial (BCV) o de referencia para
+              mostrar el resultado también en divisas (USD). Si se deja vacío,
+              solo se mostrará en moneda nacional.
+            </p>
+          </div>
+
+
           <Button onClick={onCalcular} className="w-full bg-primary hover:bg-primary-glow" size="lg">
             <Calculator className="h-4 w-4 mr-2" /> Calcular
           </Button>
@@ -356,6 +386,14 @@ const Prestaciones = () => {
                 <div>
                   <p className="text-xs uppercase tracking-wider text-muted-foreground">Total a pagar</p>
                   <p className="font-serif text-4xl text-accent">{formatBs(resultado.total_pagar)}</p>
+                  {tasaUSDNum > 0 && (
+                    <p className="font-serif text-xl text-accent/80 mt-1">
+                      ≈ {formatUSD(toUSD(resultado.total_pagar))}
+                      <span className="text-xs text-muted-foreground ml-2">
+                        (tasa {formatBs(tasaUSDNum)}/USD)
+                      </span>
+                    </p>
+                  )}
                   {trabajador && <p className="text-sm text-muted-foreground mt-1">Trabajador: {trabajador}</p>}
                 </div>
                 <Button variant="outline" size="sm" onClick={() => window.print()} className="print:hidden">
@@ -492,7 +530,12 @@ const Prestaciones = () => {
                   <Row label="(−) Anticipos" value={formatBs(resultado.anticipos)} />
                 )}
                 <div className="border-t pt-2 mt-2">
-                  <Row label="TOTAL A PAGAR" value={formatBs(resultado.total_pagar)} bold />
+                  <Row label="TOTAL A PAGAR" value={dual(resultado.total_pagar)} bold />
+                  {tasaUSDNum > 0 && (
+                    <p className="text-[11px] text-muted-foreground text-right mt-1">
+                      Conversión referencial a tasa {formatBs(tasaUSDNum)}/USD
+                    </p>
+                  )}
                 </div>
               </div>
 
