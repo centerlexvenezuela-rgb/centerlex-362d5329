@@ -33,9 +33,8 @@ const Prestaciones = () => {
   const [trabajador, setTrabajador] = useState("");
   const [fechaInicio, setFechaInicio] = useState("");
   const [fechaFin, setFechaFin] = useState("");
-  const [salarios, setSalarios] = useState<SalarioPeriodo[]>([
-    { desde: "", salario_base: 0, otros_bonos: 0 },
-  ]);
+  const [salarioBase, setSalarioBase] = useState<string>("");
+  const [otrosBonos, setOtrosBonos] = useState<string>("");
   const [diasUtilidades, setDiasUtilidades] = useState("30");
   const [diasBVBase, setDiasBVBase] = useState("15");
   const [incrementoBV, setIncrementoBV] = useState("1");
@@ -84,24 +83,16 @@ const Prestaciones = () => {
     return <Card className="p-6">No se pudieron cargar los parámetros.</Card>;
   }
 
-  const addSalario = () =>
-    setSalarios((xs) => [...xs, { desde: "", salario_base: 0, otros_bonos: 0 }]);
-  const removeSalario = (i: number) =>
-    setSalarios((xs) => xs.filter((_, k) => k !== i));
-  const setSal = (i: number, patch: Partial<SalarioPeriodo>) =>
-    setSalarios((xs) => xs.map((s, k) => (k === i ? { ...s, ...patch } : s)));
-
   const onCalcular = () => {
     try {
       if (!fechaInicio || !fechaFin) return toast.error("Indique las fechas");
-      const sals = salarios
-        .filter((s) => s.desde && s.salario_base > 0)
-        .map((s) => ({
-          desde: s.desde,
-          salario_base: Number(s.salario_base),
-          otros_bonos: Number(s.otros_bonos ?? 0),
-        }));
-      if (!sals.length) return toast.error("Agregue al menos un salario válido");
+      const base = parseFloat((salarioBase || "").replace(",", ".")) || 0;
+      const bonos = parseFloat((otrosBonos || "").replace(",", ".")) || 0;
+      if (base <= 0) return toast.error("Indique el salario base actual");
+
+      const sals: SalarioPeriodo[] = [
+        { desde: fechaInicio, salario_base: base, otros_bonos: bonos },
+      ];
 
       const a = anticipos ? parseFloat(anticipos.replace(",", ".")) : 0;
       const r = calcularPrestaciones(
@@ -162,54 +153,34 @@ const Prestaciones = () => {
           </div>
 
           <div className="space-y-3 rounded border p-3">
-            <div className="flex items-center justify-between">
-              <Label className="text-sm font-semibold">Salarios (base + bonos permanentes)</Label>
-              <Button variant="outline" size="sm" onClick={addSalario}>
-                <Plus className="h-4 w-4 mr-1" /> Período
-              </Button>
-            </div>
+            <Label className="text-sm font-semibold">Salario (base + bonos permanentes)</Label>
             <p className="text-xs text-muted-foreground">
-              Añada un período por cada cambio de salario. Los "otros bonos" deben ser pagos continuos
-              y permanentes que forman parte del salario.
+              El cálculo se realiza con el salario base actual del trabajador más los
+              "otros bonos" continuos y permanentes que forman parte del salario
+              (compensaciones regulares por su trabajo).
             </p>
-            {salarios.map((s, i) => (
-              <div key={i} className="grid gap-2 md:grid-cols-[1fr_1fr_1fr_auto] items-end">
-                <div className="space-y-1">
-                  <Label className="text-xs">Desde</Label>
-                  <Input
-                    type="date"
-                    value={s.desde}
-                    onChange={(e) => setSal(i, { desde: e.target.value })}
-                  />
-                </div>
-                <div className="space-y-1">
-                  <Label className="text-xs">Salario base (Bs.)</Label>
-                  <Input
-                    type="number"
-                    step="0.01"
-                    value={s.salario_base || ""}
-                    onChange={(e) => setSal(i, { salario_base: parseFloat(e.target.value) || 0 })}
-                  />
-                </div>
-                <div className="space-y-1">
-                  <Label className="text-xs">Otros bonos (Bs.)</Label>
-                  <Input
-                    type="number"
-                    step="0.01"
-                    value={s.otros_bonos || ""}
-                    onChange={(e) => setSal(i, { otros_bonos: parseFloat(e.target.value) || 0 })}
-                  />
-                </div>
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  onClick={() => removeSalario(i)}
-                  disabled={salarios.length === 1}
-                >
-                  <Trash2 className="h-4 w-4" />
-                </Button>
+            <div className="grid gap-2 md:grid-cols-2">
+              <div className="space-y-1">
+                <Label className="text-xs">Salario base actual (Bs.)</Label>
+                <Input
+                  type="number"
+                  step="0.01"
+                  value={salarioBase}
+                  onChange={(e) => setSalarioBase(e.target.value)}
+                  placeholder="0.00"
+                />
               </div>
-            ))}
+              <div className="space-y-1">
+                <Label className="text-xs">Otros bonos permanentes (Bs.)</Label>
+                <Input
+                  type="number"
+                  step="0.01"
+                  value={otrosBonos}
+                  onChange={(e) => setOtrosBonos(e.target.value)}
+                  placeholder="0.00"
+                />
+              </div>
+            </div>
           </div>
 
           <div className="grid gap-3 md:grid-cols-3">
