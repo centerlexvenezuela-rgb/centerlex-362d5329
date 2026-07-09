@@ -41,7 +41,20 @@ const Prestaciones = () => {
   const [motivo, setMotivo] = useState<MotivoTerminacion>("despido_injustificado");
   const [eligeIndemnizacion, setEligeIndemnizacion] = useState(true);
   const [anticipos, setAnticipos] = useState("");
+  const [tasaUSD, setTasaUSD] = useState<string>("");
   const [resultado, setResultado] = useState<PrestacionesResultado | null>(null);
+
+  const tasaUSDNum = parseFloat((tasaUSD || "").replace(",", ".")) || 0;
+  const formatUSD = (n: number) =>
+    new Intl.NumberFormat("en-US", {
+      style: "currency",
+      currency: "USD",
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
+    }).format(Number.isFinite(n) ? n : 0);
+  const toUSD = (bs: number) => (tasaUSDNum > 0 ? bs / tasaUSDNum : 0);
+  const dual = (bs: number) =>
+    tasaUSDNum > 0 ? `${formatBs(bs)} · ${formatUSD(toUSD(bs))}` : formatBs(bs);
 
   useEffect(() => {
     const load = async () => {
