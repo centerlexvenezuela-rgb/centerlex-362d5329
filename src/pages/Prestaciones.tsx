@@ -349,6 +349,23 @@ const Prestaciones = () => {
             />
           </div>
 
+          <div className="space-y-2">
+            <Label>Tasa de cambio del dólar (Bs. por USD)</Label>
+            <Input
+              type="number"
+              step="0.0001"
+              value={tasaUSD}
+              onChange={(e) => setTasaUSD(e.target.value)}
+              placeholder="Ej: 145.50"
+            />
+            <p className="text-[11px] text-muted-foreground leading-snug">
+              Introduzca la tasa de cambio oficial (BCV) o de referencia para
+              mostrar el resultado también en divisas (USD). Si se deja vacío,
+              solo se mostrará en moneda nacional.
+            </p>
+          </div>
+
+
           <Button onClick={onCalcular} className="w-full bg-primary hover:bg-primary-glow" size="lg">
             <Calculator className="h-4 w-4 mr-2" /> Calcular
           </Button>
