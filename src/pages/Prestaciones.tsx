@@ -33,9 +33,8 @@ const Prestaciones = () => {
   const [trabajador, setTrabajador] = useState("");
   const [fechaInicio, setFechaInicio] = useState("");
   const [fechaFin, setFechaFin] = useState("");
-  const [salarios, setSalarios] = useState<SalarioPeriodo[]>([
-    { desde: "", salario_base: 0, otros_bonos: 0 },
-  ]);
+  const [salarioBase, setSalarioBase] = useState<string>("");
+  const [otrosBonos, setOtrosBonos] = useState<string>("");
   const [diasUtilidades, setDiasUtilidades] = useState("30");
   const [diasBVBase, setDiasBVBase] = useState("15");
   const [incrementoBV, setIncrementoBV] = useState("1");
