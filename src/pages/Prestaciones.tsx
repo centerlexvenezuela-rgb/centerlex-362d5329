@@ -530,7 +530,12 @@ const Prestaciones = () => {
                   <Row label="(−) Anticipos" value={formatBs(resultado.anticipos)} />
                 )}
                 <div className="border-t pt-2 mt-2">
-                  <Row label="TOTAL A PAGAR" value={formatBs(resultado.total_pagar)} bold />
+                  <Row label="TOTAL A PAGAR" value={dual(resultado.total_pagar)} bold />
+                  {tasaUSDNum > 0 && (
+                    <p className="text-[11px] text-muted-foreground text-right mt-1">
+                      Conversión referencial a tasa {formatBs(tasaUSDNum)}/USD
+                    </p>
+                  )}
                 </div>
               </div>
 
