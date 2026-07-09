@@ -83,24 +83,16 @@ const Prestaciones = () => {
     return <Card className="p-6">No se pudieron cargar los parámetros.</Card>;
   }
 
-  const addSalario = () =>
-    setSalarios((xs) => [...xs, { desde: "", salario_base: 0, otros_bonos: 0 }]);
-  const removeSalario = (i: number) =>
-    setSalarios((xs) => xs.filter((_, k) => k !== i));
-  const setSal = (i: number, patch: Partial<SalarioPeriodo>) =>
-    setSalarios((xs) => xs.map((s, k) => (k === i ? { ...s, ...patch } : s)));
-
   const onCalcular = () => {
     try {
       if (!fechaInicio || !fechaFin) return toast.error("Indique las fechas");
-      const sals = salarios
-        .filter((s) => s.desde && s.salario_base > 0)
-        .map((s) => ({
-          desde: s.desde,
-          salario_base: Number(s.salario_base),
-          otros_bonos: Number(s.otros_bonos ?? 0),
-        }));
-      if (!sals.length) return toast.error("Agregue al menos un salario válido");
+      const base = parseFloat((salarioBase || "").replace(",", ".")) || 0;
+      const bonos = parseFloat((otrosBonos || "").replace(",", ".")) || 0;
+      if (base <= 0) return toast.error("Indique el salario base actual");
+
+      const sals: SalarioPeriodo[] = [
+        { desde: fechaInicio, salario_base: base, otros_bonos: bonos },
+      ];
 
       const a = anticipos ? parseFloat(anticipos.replace(",", ".")) : 0;
       const r = calcularPrestaciones(
