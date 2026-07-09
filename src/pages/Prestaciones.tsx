@@ -386,6 +386,14 @@ const Prestaciones = () => {
                 <div>
                   <p className="text-xs uppercase tracking-wider text-muted-foreground">Total a pagar</p>
                   <p className="font-serif text-4xl text-accent">{formatBs(resultado.total_pagar)}</p>
+                  {tasaUSDNum > 0 && (
+                    <p className="font-serif text-xl text-accent/80 mt-1">
+                      ≈ {formatUSD(toUSD(resultado.total_pagar))}
+                      <span className="text-xs text-muted-foreground ml-2">
+                        (tasa {formatBs(tasaUSDNum)}/USD)
+                      </span>
+                    </p>
+                  )}
                   {trabajador && <p className="text-sm text-muted-foreground mt-1">Trabajador: {trabajador}</p>}
                 </div>
                 <Button variant="outline" size="sm" onClick={() => window.print()} className="print:hidden">
