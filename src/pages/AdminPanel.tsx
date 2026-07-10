@@ -18,7 +18,7 @@ import {
   AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
-import { ShieldCheck, UserPlus, Trash2, LogOut, Loader2, Sparkles, Calculator, Banknote, Pencil, UserSquare2, Power } from "lucide-react";
+import { ShieldCheck, UserPlus, Trash2, LogOut, Loader2, Sparkles, Calculator, Banknote, Receipt, Pencil, UserSquare2, Power } from "lucide-react";
 import { BrandingSection } from "@/components/BrandingSection";
 import { LandingContentSection } from "@/components/LandingContentSection";
 import { ContactMessagesSection } from "@/components/ContactMessagesSection";
@@ -41,6 +41,7 @@ interface Lawyer {
   ai_enabled: boolean;
   fees_enabled: boolean;
   prestaciones_enabled: boolean;
+  islr_enabled: boolean;
   directory_enabled: boolean;
   whatsapp: string | null;
   bar_association: string | null;
@@ -156,6 +157,20 @@ const AdminPanel = () => {
       return toast.error(error?.message ?? data?.error ?? "Error");
     }
     toast.success(next ? "Calculadora de Prestaciones habilitada" : "Calculadora de Prestaciones deshabilitada");
+  };
+
+  const handleToggleIslr = async (id: string, next: boolean) => {
+    setTogglingId(id);
+    setLawyers((prev) => prev.map((l) => (l.id === id ? { ...l, islr_enabled: next } : l)));
+    const { data, error } = await supabase.functions.invoke("admin-users", {
+      body: { action: "toggle_islr", user_id: id, islr_enabled: next },
+    });
+    setTogglingId(null);
+    if (error || data?.error) {
+      setLawyers((prev) => prev.map((l) => (l.id === id ? { ...l, islr_enabled: !next } : l)));
+      return toast.error(error?.message ?? data?.error ?? "Error");
+    }
+    toast.success(next ? "Calculadora de ISLR habilitada" : "Calculadora de ISLR deshabilitada");
   };
 
   const handleToggleDirectory = async (id: string, next: boolean) => {
@@ -345,6 +360,11 @@ const AdminPanel = () => {
                     </TableHead>
                     <TableHead className="text-center">
                       <span className="inline-flex items-center gap-1">
+                        <Receipt className="h-3.5 w-3.5" /> ISLR
+                      </span>
+                    </TableHead>
+                    <TableHead className="text-center">
+                      <span className="inline-flex items-center gap-1">
                         <UserSquare2 className="h-3.5 w-3.5" /> Directorio
                       </span>
                     </TableHead>
@@ -408,6 +428,18 @@ const AdminPanel = () => {
                             />
                             <span className="text-xs text-muted-foreground">
                               {l.prestaciones_enabled ? "Activa" : "Inactiva"}
+                            </span>
+                          </div>
+                        </TableCell>
+                        <TableCell className="text-center">
+                          <div className="inline-flex items-center gap-2">
+                            <Switch
+                              checked={l.islr_enabled}
+                              disabled={togglingId === l.id}
+                              onCheckedChange={(v) => handleToggleIslr(l.id, v)}
+                            />
+                            <span className="text-xs text-muted-foreground">
+                              {l.islr_enabled ? "Activa" : "Inactiva"}
                             </span>
                           </div>
                         </TableCell>

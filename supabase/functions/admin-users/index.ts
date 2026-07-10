@@ -62,7 +62,7 @@ Deno.serve(async (req) => {
       const { data: roles } = await admin.from("user_roles").select("user_id, role");
       const { data: profiles } = await admin
         .from("profiles")
-        .select("user_id, first_name, last_name, ai_enabled, fees_enabled, prestaciones_enabled, directory_enabled, whatsapp, bar_association, city, state, photo_url");
+        .select("user_id, first_name, last_name, ai_enabled, fees_enabled, prestaciones_enabled, islr_enabled, directory_enabled, whatsapp, bar_association, city, state, photo_url");
       const lawyers = list.users
         .map((u) => {
           const r = roles?.find((x) => x.user_id === u.id);
@@ -80,6 +80,7 @@ Deno.serve(async (req) => {
             ai_enabled: p?.ai_enabled ?? false,
             fees_enabled: p?.fees_enabled ?? false,
             prestaciones_enabled: p?.prestaciones_enabled ?? false,
+            islr_enabled: p?.islr_enabled ?? false,
             directory_enabled: p?.directory_enabled ?? false,
             whatsapp: p?.whatsapp ?? null,
             bar_association: p?.bar_association ?? null,
@@ -163,6 +164,7 @@ Deno.serve(async (req) => {
       action === "toggle_ai" ||
       action === "toggle_fees" ||
       action === "toggle_prestaciones" ||
+      action === "toggle_islr" ||
       action === "toggle_directory"
     ) {
       const { user_id } = body;
@@ -170,6 +172,7 @@ Deno.serve(async (req) => {
         toggle_ai: "ai_enabled",
         toggle_fees: "fees_enabled",
         toggle_prestaciones: "prestaciones_enabled",
+        toggle_islr: "islr_enabled",
         toggle_directory: "directory_enabled",
       } as const;
       const field = fieldMap[action as keyof typeof fieldMap];
@@ -177,6 +180,7 @@ Deno.serve(async (req) => {
         action === "toggle_ai" ? body.ai_enabled
         : action === "toggle_fees" ? body.fees_enabled
         : action === "toggle_prestaciones" ? body.prestaciones_enabled
+        : action === "toggle_islr" ? body.islr_enabled
         : body.directory_enabled;
       if (!user_id || typeof value !== "boolean") {
         return new Response(JSON.stringify({ error: "Parámetros inválidos" }), {
