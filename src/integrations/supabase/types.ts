@@ -451,6 +451,7 @@ export type Database = {
           google_folder_id: string | null
           google_refresh_token: string | null
           id: string
+          islr_enabled: boolean
           last_name: string | null
           photo_url: string | null
           prestaciones_enabled: boolean
@@ -473,6 +474,7 @@ export type Database = {
           google_folder_id?: string | null
           google_refresh_token?: string | null
           id?: string
+          islr_enabled?: boolean
           last_name?: string | null
           photo_url?: string | null
           prestaciones_enabled?: boolean
@@ -495,6 +497,7 @@ export type Database = {
           google_folder_id?: string | null
           google_refresh_token?: string | null
           id?: string
+          islr_enabled?: boolean
           last_name?: string | null
           photo_url?: string | null
           prestaciones_enabled?: boolean
