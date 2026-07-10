@@ -360,6 +360,11 @@ const AdminPanel = () => {
                     </TableHead>
                     <TableHead className="text-center">
                       <span className="inline-flex items-center gap-1">
+                        <Receipt className="h-3.5 w-3.5" /> ISLR
+                      </span>
+                    </TableHead>
+                    <TableHead className="text-center">
+                      <span className="inline-flex items-center gap-1">
                         <UserSquare2 className="h-3.5 w-3.5" /> Directorio
                       </span>
                     </TableHead>
@@ -423,6 +428,18 @@ const AdminPanel = () => {
                             />
                             <span className="text-xs text-muted-foreground">
                               {l.prestaciones_enabled ? "Activa" : "Inactiva"}
+                            </span>
+                          </div>
+                        </TableCell>
+                        <TableCell className="text-center">
+                          <div className="inline-flex items-center gap-2">
+                            <Switch
+                              checked={l.islr_enabled}
+                              disabled={togglingId === l.id}
+                              onCheckedChange={(v) => handleToggleIslr(l.id, v)}
+                            />
+                            <span className="text-xs text-muted-foreground">
+                              {l.islr_enabled ? "Activa" : "Inactiva"}
                             </span>
                           </div>
                         </TableCell>
