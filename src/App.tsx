@@ -22,6 +22,7 @@ import Assistant from "./pages/Assistant";
 import Settings from "./pages/Settings";
 import Fees from "./pages/Fees";
 import Prestaciones from "./pages/Prestaciones";
+import Islr from "./pages/Islr";
 import Directory from "./pages/Directory";
 import NotFound from "./pages/NotFound.tsx";
 import Privacy from "./pages/Privacy";
@@ -63,6 +64,7 @@ const App = () => (
               <Route path="/asistente" element={<Assistant />} />
               <Route path="/honorarios" element={<Fees />} />
               <Route path="/prestaciones" element={<Prestaciones />} />
+              <Route path="/islr" element={<Islr />} />
               <Route path="/cuenta" element={<Settings />} />
             </Route>
             <Route path="*" element={<NotFound />} />
