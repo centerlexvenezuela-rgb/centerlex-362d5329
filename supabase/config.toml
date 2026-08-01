@@ -11,3 +11,12 @@ verify_jwt = false
 
 [functions.google-drive]
 verify_jwt = false
+
+[functions.report-payment]
+verify_jwt = false
+
+[functions.signup-lawyer]
+verify_jwt = false
+
+[functions.inactive-contact]
+verify_jwt = false
