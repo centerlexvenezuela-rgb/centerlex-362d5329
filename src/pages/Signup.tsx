@@ -98,7 +98,7 @@ const Signup = () => {
               <SelectTrigger id="st"><SelectValue placeholder="Seleccione" /></SelectTrigger>
               <SelectContent>
                 {VENEZUELA_STATES.map((s) => (
-                  <SelectItem key={s} value={s}>{s}</SelectItem>
+                  <SelectItem key={s.name} value={s.name}>{s.name}</SelectItem>
                 ))}
               </SelectContent>
             </Select>
