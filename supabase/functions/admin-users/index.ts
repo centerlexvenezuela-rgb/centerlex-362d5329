@@ -62,18 +62,24 @@ Deno.serve(async (req) => {
       const { data: roles } = await admin.from("user_roles").select("user_id, role");
       const { data: profiles } = await admin
         .from("profiles")
-        .select("user_id, first_name, last_name, ai_enabled, fees_enabled, prestaciones_enabled, islr_enabled, directory_enabled, whatsapp, bar_association, city, state, photo_url");
+        .select("user_id, first_name, last_name, ai_enabled, fees_enabled, prestaciones_enabled, islr_enabled, directory_enabled, whatsapp, bar_association, city, state, photo_url, cedula, inpreabogado, bar_number, phone, account_active, trial_ends_at");
       const lawyers = list.users
         .map((u) => {
           const r = roles?.find((x) => x.user_id === u.id);
           const p = profiles?.find((x) => x.user_id === u.id) as any;
           const bannedUntil = (u as any).banned_until as string | null | undefined;
           const isBanned = !!bannedUntil && new Date(bannedUntil).getTime() > Date.now();
+          const trialEnds = p?.trial_ends_at ?? null;
+          const trialExpired = !!trialEnds && new Date(trialEnds).getTime() <= Date.now();
+          const active = (p?.account_active ?? true) && !isBanned && !trialExpired;
           return {
             id: u.id,
             email: u.email,
             created_at: u.created_at,
-            banned: isBanned,
+            banned: !active,
+            account_active: p?.account_active ?? true,
+            trial_ends_at: trialEnds,
+            trial_expired: trialExpired,
             role: r?.role ?? null,
             first_name: p?.first_name ?? null,
             last_name: p?.last_name ?? null,
@@ -87,6 +93,10 @@ Deno.serve(async (req) => {
             city: p?.city ?? null,
             state: p?.state ?? null,
             photo_url: p?.photo_url ?? null,
+            cedula: p?.cedula ?? null,
+            inpreabogado: p?.inpreabogado ?? null,
+            bar_number: p?.bar_number ?? null,
+            phone: p?.phone ?? null,
           };
         })
         .filter((u) => u.role === "lawyer");
@@ -138,7 +148,7 @@ Deno.serve(async (req) => {
     }
 
     if (action === "update_profile") {
-      const { user_id, first_name, last_name, whatsapp, bar_association, city, state, photo_url } = body;
+      const { user_id, first_name, last_name, whatsapp, bar_association, city, state, photo_url, cedula, inpreabogado, bar_number, phone } = body;
       if (!user_id) {
         return new Response(JSON.stringify({ error: "user_id requerido" }), {
           status: 400,
@@ -153,6 +163,10 @@ Deno.serve(async (req) => {
       if (city !== undefined) patch.city = city || null;
       if (state !== undefined) patch.state = state || null;
       if (photo_url !== undefined) patch.photo_url = photo_url || null;
+      if (cedula !== undefined) patch.cedula = cedula || null;
+      if (inpreabogado !== undefined) patch.inpreabogado = inpreabogado || null;
+      if (bar_number !== undefined) patch.bar_number = bar_number || null;
+      if (phone !== undefined) patch.phone = phone || null;
       const { error } = await admin.from("profiles").update(patch).eq("user_id", user_id);
       if (error) throw error;
       return new Response(JSON.stringify({ ok: true }), {
@@ -218,8 +232,8 @@ Deno.serve(async (req) => {
           headers: { ...corsHeaders, "Content-Type": "application/json" },
         });
       }
-      const ban_duration = active ? "none" : "876000h";
-      // Use GoTrue admin REST directly to guarantee ban_duration is honored
+      // Siempre quitamos el ban de GoTrue: el bloqueo se controla en el perfil
+      // para poder mostrar la página informativa de cuenta inactiva.
       const resp = await fetch(`${SUPABASE_URL}/auth/v1/admin/users/${user_id}`, {
         method: "PUT",
         headers: {
@@ -227,17 +241,52 @@ Deno.serve(async (req) => {
           Authorization: `Bearer ${SERVICE_ROLE}`,
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ ban_duration }),
+        body: JSON.stringify({ ban_duration: "none" }),
       });
-      const text = await resp.text();
       if (!resp.ok) {
-        console.error("toggle_active failed", resp.status, text);
-        return new Response(
-          JSON.stringify({ error: `No se pudo actualizar la cuenta: ${text}` }),
-          { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } },
-        );
+        const text = await resp.text();
+        console.error("toggle_active unban failed", resp.status, text);
+      }
+
+      const patch: Record<string, any> = { account_active: active };
+      // Al habilitar manualmente, el período de prueba deja de aplicar
+      if (active) patch.trial_ends_at = null;
+
+      const { data: existing } = await admin
+        .from("profiles")
+        .select("id")
+        .eq("user_id", user_id)
+        .maybeSingle();
+      if (existing) {
+        const { error } = await admin.from("profiles").update(patch).eq("user_id", user_id);
+        if (error) throw error;
+      } else {
+        const { error } = await admin.from("profiles").insert({ user_id, ...patch });
+        if (error) throw error;
       }
       return new Response(JSON.stringify({ ok: true }), {
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
+    if (action === "set_trial") {
+      const { user_id, days } = body;
+      if (!user_id) {
+        return new Response(JSON.stringify({ error: "user_id requerido" }), {
+          status: 400,
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      }
+      const trial_ends_at =
+        typeof days === "number" && days > 0
+          ? new Date(Date.now() + days * 86400000).toISOString()
+          : null;
+      const { error } = await admin
+        .from("profiles")
+        .update({ trial_ends_at, account_active: true })
+        .eq("user_id", user_id);
+      if (error) throw error;
+      return new Response(JSON.stringify({ ok: true, trial_ends_at }), {
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }

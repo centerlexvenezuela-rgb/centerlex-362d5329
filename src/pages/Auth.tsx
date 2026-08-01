@@ -7,6 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card } from "@/components/ui/card";
 import { Scale, ShieldCheck } from "lucide-react";
+import { ReportPaymentDialog } from "@/components/ReportPaymentDialog";
 import { toast } from "sonner";
 
 const Auth = () => {
@@ -135,14 +136,25 @@ const Auth = () => {
             </Button>
           </form>
 
-          <div className="mt-6 pt-6 border-t text-center">
-            <Link
-              to="/admin/login"
-              className="inline-flex items-center gap-2 text-xs text-muted-foreground hover:text-accent transition-colors"
-            >
-              <ShieldCheck className="h-3.5 w-3.5" />
-              Acceso de administrador
-            </Link>
+          <div className="mt-6 pt-6 border-t space-y-4">
+            <div className="text-center text-sm">
+              ¿No tiene cuenta?{" "}
+              <Link to="/registro" className="text-accent underline hover:opacity-80">
+                Regístrese y pruebe 7 días gratis
+              </Link>
+            </div>
+            <div className="flex justify-center">
+              <ReportPaymentDialog publicMode />
+            </div>
+            <div className="text-center">
+              <Link
+                to="/admin/login"
+                className="inline-flex items-center gap-2 text-xs text-muted-foreground hover:text-accent transition-colors"
+              >
+                <ShieldCheck className="h-3.5 w-3.5" />
+                Acceso de administrador
+              </Link>
+            </div>
           </div>
         </Card>
       </div>

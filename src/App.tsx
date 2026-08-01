@@ -10,6 +10,8 @@ import { ProtectedRoute } from "@/components/ProtectedRoute";
 import { AppLayout } from "@/components/AppLayout";
 import Landing from "./pages/Landing";
 import Auth from "./pages/Auth";
+import Signup from "./pages/Signup";
+import AccountDisabled from "./pages/AccountDisabled";
 import AdminAuth from "./pages/AdminAuth";
 import AdminPanel from "./pages/AdminPanel";
 import Dashboard from "./pages/Dashboard";
@@ -45,6 +47,8 @@ const App = () => (
             <Route path="/privacidad" element={<Privacy />} />
             <Route path="/terminos" element={<Terms />} />
             <Route path="/auth" element={<Auth />} />
+            <Route path="/registro" element={<Signup />} />
+            <Route path="/cuenta-inactiva" element={<AccountDisabled />} />
             <Route path="/admin/login" element={<AdminAuth />} />
             <Route
               path="/admin"
