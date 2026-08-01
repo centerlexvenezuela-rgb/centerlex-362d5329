@@ -1,5 +1,6 @@
 import { Navigate } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
+import { isAccountBlocked, useProfile } from "@/hooks/useProfile";
 import { Scale } from "lucide-react";
 
 interface Props {
@@ -10,8 +11,9 @@ interface Props {
 
 export const ProtectedRoute = ({ children, requireRole = "lawyer", redirectTo }: Props) => {
   const { session, role, loading } = useAuth();
+  const { profile, loading: profileLoading } = useProfile();
 
-  if (loading) {
+  if (loading || (session && requireRole === "lawyer" && profileLoading)) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-background">
         <Scale className="h-10 w-10 text-accent animate-pulse" />
@@ -26,6 +28,10 @@ export const ProtectedRoute = ({ children, requireRole = "lawyer", redirectTo }:
   if (role && role !== requireRole) {
     // logged in but wrong role
     return <Navigate to={requireRole === "admin" ? "/admin/login" : "/auth"} replace />;
+  }
+
+  if (requireRole === "lawyer" && isAccountBlocked(profile)) {
+    return <Navigate to="/cuenta-inactiva" replace />;
   }
 
   return <>{children}</>;
