@@ -26,6 +26,8 @@ import { ChangePasswordSection } from "@/components/ChangePasswordSection";
 import { FeesAdminSection } from "@/components/FeesAdminSection";
 import { PrestacionesAdminSection } from "@/components/PrestacionesAdminSection";
 import { BackupSection } from "@/components/BackupSection";
+import { PaymentsAdminSection } from "@/components/PaymentsAdminSection";
+import { NotificationSettingsSection } from "@/components/NotificationSettingsSection";
 import { EditLawyerDialog } from "@/components/EditLawyerDialog";
 import { VENEZUELA_STATES } from "@/lib/venezuela";
 import { toast } from "sonner";
@@ -43,6 +45,8 @@ interface Lawyer {
   prestaciones_enabled: boolean;
   islr_enabled: boolean;
   directory_enabled: boolean;
+  trial_ends_at: string | null;
+  trial_expired: boolean;
   whatsapp: string | null;
   bar_association: string | null;
   city: string | null;
@@ -230,6 +234,8 @@ const AdminPanel = () => {
       </header>
 
       <main className="max-w-6xl mx-auto px-6 py-8 space-y-8">
+        <PaymentsAdminSection />
+        <NotificationSettingsSection />
         <ContactMessagesSection />
         <BrandingSection />
         <LandingContentSection />
