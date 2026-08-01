@@ -62,18 +62,24 @@ Deno.serve(async (req) => {
       const { data: roles } = await admin.from("user_roles").select("user_id, role");
       const { data: profiles } = await admin
         .from("profiles")
-        .select("user_id, first_name, last_name, ai_enabled, fees_enabled, prestaciones_enabled, islr_enabled, directory_enabled, whatsapp, bar_association, city, state, photo_url");
+        .select("user_id, first_name, last_name, ai_enabled, fees_enabled, prestaciones_enabled, islr_enabled, directory_enabled, whatsapp, bar_association, city, state, photo_url, cedula, inpreabogado, bar_number, phone, account_active, trial_ends_at");
       const lawyers = list.users
         .map((u) => {
           const r = roles?.find((x) => x.user_id === u.id);
           const p = profiles?.find((x) => x.user_id === u.id) as any;
           const bannedUntil = (u as any).banned_until as string | null | undefined;
           const isBanned = !!bannedUntil && new Date(bannedUntil).getTime() > Date.now();
+          const trialEnds = p?.trial_ends_at ?? null;
+          const trialExpired = !!trialEnds && new Date(trialEnds).getTime() <= Date.now();
+          const active = (p?.account_active ?? true) && !isBanned && !trialExpired;
           return {
             id: u.id,
             email: u.email,
             created_at: u.created_at,
-            banned: isBanned,
+            banned: !active,
+            account_active: p?.account_active ?? true,
+            trial_ends_at: trialEnds,
+            trial_expired: trialExpired,
             role: r?.role ?? null,
             first_name: p?.first_name ?? null,
             last_name: p?.last_name ?? null,
@@ -87,6 +93,10 @@ Deno.serve(async (req) => {
             city: p?.city ?? null,
             state: p?.state ?? null,
             photo_url: p?.photo_url ?? null,
+            cedula: p?.cedula ?? null,
+            inpreabogado: p?.inpreabogado ?? null,
+            bar_number: p?.bar_number ?? null,
+            phone: p?.phone ?? null,
           };
         })
         .filter((u) => u.role === "lawyer");
