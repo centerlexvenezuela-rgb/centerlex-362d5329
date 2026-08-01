@@ -4,6 +4,7 @@ import { z } from "zod";
 import { useBranding, interpolate } from "@/hooks/useBranding";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
+import { ReportPaymentDialog } from "@/components/ReportPaymentDialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
