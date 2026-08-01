@@ -74,6 +74,7 @@ export interface Branding {
   og_title: string | null;
   logo_url: string | null;
   favicon_url: string | null;
+  disabled_account_text: string | null;
   landing_content: LandingContent;
 }
 
@@ -85,6 +86,7 @@ const defaults: Branding = {
   og_title: null,
   logo_url: null,
   favicon_url: null,
+  disabled_account_text: null,
   landing_content: defaultLandingContent,
 };
 
