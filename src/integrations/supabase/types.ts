@@ -18,6 +18,7 @@ export type Database = {
         Row: {
           app_subtitle: string
           app_title: string
+          disabled_account_text: string | null
           favicon_url: string | null
           id: string
           landing_content: Json
@@ -31,6 +32,7 @@ export type Database = {
         Insert: {
           app_subtitle?: string
           app_title?: string
+          disabled_account_text?: string | null
           favicon_url?: string | null
           id?: string
           landing_content?: Json
@@ -44,6 +46,7 @@ export type Database = {
         Update: {
           app_subtitle?: string
           app_title?: string
+          disabled_account_text?: string | null
           favicon_url?: string | null
           id?: string
           landing_content?: Json
@@ -376,6 +379,75 @@ export type Database = {
         }
         Relationships: []
       }
+      notification_settings: {
+        Row: {
+          created_at: string
+          key: string
+          updated_at: string
+          value: string | null
+        }
+        Insert: {
+          created_at?: string
+          key: string
+          updated_at?: string
+          value?: string | null
+        }
+        Update: {
+          created_at?: string
+          key?: string
+          updated_at?: string
+          value?: string | null
+        }
+        Relationships: []
+      }
+      payments: {
+        Row: {
+          amount: number
+          confirmed_at: string | null
+          created_at: string
+          id: string
+          month: string
+          paid_at: string | null
+          reference: string
+          reported_at: string
+          reporter_email: string | null
+          reporter_name: string | null
+          status: string
+          updated_at: string
+          user_id: string | null
+        }
+        Insert: {
+          amount: number
+          confirmed_at?: string | null
+          created_at?: string
+          id?: string
+          month: string
+          paid_at?: string | null
+          reference: string
+          reported_at?: string
+          reporter_email?: string | null
+          reporter_name?: string | null
+          status?: string
+          updated_at?: string
+          user_id?: string | null
+        }
+        Update: {
+          amount?: number
+          confirmed_at?: string | null
+          created_at?: string
+          id?: string
+          month?: string
+          paid_at?: string | null
+          reference?: string
+          reported_at?: string
+          reporter_email?: string | null
+          reporter_name?: string | null
+          status?: string
+          updated_at?: string
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       prestaciones_settings: {
         Row: {
           created_at: string
@@ -438,8 +510,11 @@ export type Database = {
       }
       profiles: {
         Row: {
+          account_active: boolean
           ai_enabled: boolean
           bar_association: string | null
+          bar_number: string | null
+          cedula: string | null
           city: string | null
           created_at: string
           directory_enabled: boolean
@@ -451,18 +526,24 @@ export type Database = {
           google_folder_id: string | null
           google_refresh_token: string | null
           id: string
+          inpreabogado: string | null
           islr_enabled: boolean
           last_name: string | null
+          phone: string | null
           photo_url: string | null
           prestaciones_enabled: boolean
           state: string | null
+          trial_ends_at: string | null
           updated_at: string
           user_id: string
           whatsapp: string | null
         }
         Insert: {
+          account_active?: boolean
           ai_enabled?: boolean
           bar_association?: string | null
+          bar_number?: string | null
+          cedula?: string | null
           city?: string | null
           created_at?: string
           directory_enabled?: boolean
@@ -474,18 +555,24 @@ export type Database = {
           google_folder_id?: string | null
           google_refresh_token?: string | null
           id?: string
+          inpreabogado?: string | null
           islr_enabled?: boolean
           last_name?: string | null
+          phone?: string | null
           photo_url?: string | null
           prestaciones_enabled?: boolean
           state?: string | null
+          trial_ends_at?: string | null
           updated_at?: string
           user_id: string
           whatsapp?: string | null
         }
         Update: {
+          account_active?: boolean
           ai_enabled?: boolean
           bar_association?: string | null
+          bar_number?: string | null
+          cedula?: string | null
           city?: string | null
           created_at?: string
           directory_enabled?: boolean
@@ -497,11 +584,14 @@ export type Database = {
           google_folder_id?: string | null
           google_refresh_token?: string | null
           id?: string
+          inpreabogado?: string | null
           islr_enabled?: boolean
           last_name?: string | null
+          phone?: string | null
           photo_url?: string | null
           prestaciones_enabled?: boolean
           state?: string | null
+          trial_ends_at?: string | null
           updated_at?: string
           user_id?: string
           whatsapp?: string | null
