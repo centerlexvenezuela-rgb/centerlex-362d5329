@@ -148,7 +148,7 @@ Deno.serve(async (req) => {
     }
 
     if (action === "update_profile") {
-      const { user_id, first_name, last_name, whatsapp, bar_association, city, state, photo_url } = body;
+      const { user_id, first_name, last_name, whatsapp, bar_association, city, state, photo_url, cedula, inpreabogado, bar_number, phone } = body;
       if (!user_id) {
         return new Response(JSON.stringify({ error: "user_id requerido" }), {
           status: 400,
@@ -163,6 +163,10 @@ Deno.serve(async (req) => {
       if (city !== undefined) patch.city = city || null;
       if (state !== undefined) patch.state = state || null;
       if (photo_url !== undefined) patch.photo_url = photo_url || null;
+      if (cedula !== undefined) patch.cedula = cedula || null;
+      if (inpreabogado !== undefined) patch.inpreabogado = inpreabogado || null;
+      if (bar_number !== undefined) patch.bar_number = bar_number || null;
+      if (phone !== undefined) patch.phone = phone || null;
       const { error } = await admin.from("profiles").update(patch).eq("user_id", user_id);
       if (error) throw error;
       return new Response(JSON.stringify({ ok: true }), {
