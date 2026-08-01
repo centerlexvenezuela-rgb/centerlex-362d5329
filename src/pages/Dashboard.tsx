@@ -4,6 +4,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useProfile } from "@/hooks/useProfile";
 import { useAuth } from "@/hooks/useAuth";
 import { Card } from "@/components/ui/card";
+import { ReportPaymentDialog } from "@/components/ReportPaymentDialog";
 import { Users, Calendar, FolderOpen, MessageSquare, ArrowRight, Calculator } from "lucide-react";
 
 const Dashboard = () => {
@@ -26,6 +27,10 @@ const Dashboard = () => {
     };
     load();
   }, []);
+
+  const trialDaysLeft = profile?.trial_ends_at
+    ? Math.max(0, Math.ceil((new Date(profile.trial_ends_at).getTime() - Date.now()) / 86400000))
+    : null;
 
   const fullName = [profile?.first_name, profile?.last_name].filter(Boolean).join(" ").trim();
   const greeting = fullName || user?.email || "Bienvenido";
@@ -51,6 +56,14 @@ const Dashboard = () => {
         <p className="text-sm text-muted-foreground">Bienvenido</p>
         <h1 className="font-serif text-4xl mb-2">{greeting}</h1>
         <p className="text-muted-foreground">Vista general de su oficina jurídica</p>
+        <div className="mt-4 flex flex-wrap items-center gap-3">
+          <ReportPaymentDialog />
+          {trialDaysLeft !== null && (
+            <span className="text-xs rounded-full border border-accent/40 bg-accent/10 px-3 py-1">
+              Prueba gratuita: {trialDaysLeft} día(s) restante(s)
+            </span>
+          )}
+        </div>
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
