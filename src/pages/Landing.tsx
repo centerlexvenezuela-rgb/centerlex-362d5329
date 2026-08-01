@@ -120,9 +120,15 @@ const Landing = () => {
                 <LogIn className="h-5 w-5 mr-2" /> {c.hero_cta_primary}
               </Link>
             </Button>
+            <Button asChild size="lg" variant="secondary">
+              <Link to="/registro">Registrarse — 7 días gratis</Link>
+            </Button>
             <Button onClick={scrollToContact} size="lg" variant="outline">
               <Send className="h-5 w-5 mr-2" /> {c.hero_cta_secondary}
             </Button>
+          </div>
+          <div className="mt-4 flex justify-center">
+            <ReportPaymentDialog publicMode />
           </div>
         </div>
       </section>
