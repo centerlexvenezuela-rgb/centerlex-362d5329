@@ -24,6 +24,17 @@ export const NotificationSettingsSection = () => {
   const [disabledText, setDisabledText] = useState("");
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  const [testing, setTesting] = useState<string | null>(null);
+
+  const testBot = async (kind: "payments" | "signups" | "inactive") => {
+    setTesting(kind);
+    const { data, error } = await supabase.functions.invoke("notify-test", { body: { kind } });
+    setTesting(null);
+    if (error) return toast.error(error.message);
+    if (data?.ok) return toast.success("Mensaje de prueba enviado a Telegram");
+    toast.error(data?.error ?? "No se pudo enviar el mensaje de prueba");
+  };
+
 
   useEffect(() => {
     const load = async () => {
