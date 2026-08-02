@@ -107,10 +107,28 @@ export const NotificationSettingsSection = () => {
             />
           </div>
 
-          <Button onClick={save} disabled={saving}>
-            {saving ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : null}
-            Guardar
-          </Button>
+          <div className="flex flex-wrap gap-2 pt-4 border-t">
+            <Button onClick={save} disabled={saving}>
+              {saving ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : null}
+              Guardar
+            </Button>
+            {([
+              { kind: "payments", label: "Probar bot de pagos" },
+              { kind: "signups", label: "Probar bot de registros" },
+              { kind: "inactive", label: "Probar bot de inactivas" },
+            ] as const).map(({ kind, label }) => (
+              <Button
+                key={kind}
+                variant="outline"
+                disabled={testing === kind}
+                onClick={() => testBot(kind)}
+              >
+                {testing === kind ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : <Send className="h-4 w-4 mr-2" />}
+                {label}
+              </Button>
+            ))}
+          </div>
+
         </div>
       )}
     </Card>
