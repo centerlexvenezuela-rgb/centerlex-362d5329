@@ -11,6 +11,8 @@ import { AppLayout } from "@/components/AppLayout";
 import Landing from "./pages/Landing";
 import Auth from "./pages/Auth";
 import Signup from "./pages/Signup";
+import ResetPassword from "./pages/ResetPassword";
+
 import AccountDisabled from "./pages/AccountDisabled";
 import AdminAuth from "./pages/AdminAuth";
 import AdminPanel from "./pages/AdminPanel";
