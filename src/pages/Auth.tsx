@@ -8,6 +8,8 @@ import { Label } from "@/components/ui/label";
 import { Card } from "@/components/ui/card";
 import { Scale, ShieldCheck } from "lucide-react";
 import { ReportPaymentDialog } from "@/components/ReportPaymentDialog";
+import { ForgotPasswordDialog } from "@/components/ForgotPasswordDialog";
+
 import { toast } from "sonner";
 
 const Auth = () => {
