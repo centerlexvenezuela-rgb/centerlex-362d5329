@@ -48,6 +48,8 @@ const App = () => (
             <Route path="/terminos" element={<Terms />} />
             <Route path="/auth" element={<Auth />} />
             <Route path="/registro" element={<Signup />} />
+            <Route path="/restablecer" element={<ResetPassword />} />
+
             <Route path="/cuenta-inactiva" element={<AccountDisabled />} />
             <Route path="/admin/login" element={<AdminAuth />} />
             <Route
