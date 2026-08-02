@@ -26,7 +26,7 @@ import { ChangePasswordSection } from "@/components/ChangePasswordSection";
 import { FeesAdminSection } from "@/components/FeesAdminSection";
 import { PrestacionesAdminSection } from "@/components/PrestacionesAdminSection";
 import { BackupSection } from "@/components/BackupSection";
-import { PaymentsAdminSection } from "@/components/PaymentsAdminSection";
+import { AdminQueuesSection } from "@/components/AdminQueuesSection";
 import { NotificationSettingsSection } from "@/components/NotificationSettingsSection";
 import { EditLawyerDialog } from "@/components/EditLawyerDialog";
 import { VENEZUELA_STATES } from "@/lib/venezuela";
