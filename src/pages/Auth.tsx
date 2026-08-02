@@ -134,7 +134,11 @@ const Auth = () => {
             >
               {loading ? "Ingresando..." : "Ingresar"}
             </Button>
+            <div className="text-center">
+              <ForgotPasswordDialog />
+            </div>
           </form>
+
 
           <div className="mt-6 pt-6 border-t space-y-4">
             <div className="text-center text-sm">
