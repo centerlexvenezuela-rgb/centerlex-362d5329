@@ -20,3 +20,6 @@ verify_jwt = false
 
 [functions.inactive-contact]
 verify_jwt = false
+
+[functions.notify-test]
+verify_jwt = false

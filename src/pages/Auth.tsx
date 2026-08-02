@@ -8,6 +8,8 @@ import { Label } from "@/components/ui/label";
 import { Card } from "@/components/ui/card";
 import { Scale, ShieldCheck } from "lucide-react";
 import { ReportPaymentDialog } from "@/components/ReportPaymentDialog";
+import { ForgotPasswordDialog } from "@/components/ForgotPasswordDialog";
+
 import { toast } from "sonner";
 
 const Auth = () => {
@@ -134,7 +136,11 @@ const Auth = () => {
             >
               {loading ? "Ingresando..." : "Ingresar"}
             </Button>
+            <div className="text-center">
+              <ForgotPasswordDialog />
+            </div>
           </form>
+
 
           <div className="mt-6 pt-6 border-t space-y-4">
             <div className="text-center text-sm">

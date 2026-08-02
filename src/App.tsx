@@ -11,6 +11,8 @@ import { AppLayout } from "@/components/AppLayout";
 import Landing from "./pages/Landing";
 import Auth from "./pages/Auth";
 import Signup from "./pages/Signup";
+import ResetPassword from "./pages/ResetPassword";
+
 import AccountDisabled from "./pages/AccountDisabled";
 import AdminAuth from "./pages/AdminAuth";
 import AdminPanel from "./pages/AdminPanel";
@@ -48,6 +50,8 @@ const App = () => (
             <Route path="/terminos" element={<Terms />} />
             <Route path="/auth" element={<Auth />} />
             <Route path="/registro" element={<Signup />} />
+            <Route path="/restablecer" element={<ResetPassword />} />
+
             <Route path="/cuenta-inactiva" element={<AccountDisabled />} />
             <Route path="/admin/login" element={<AdminAuth />} />
             <Route

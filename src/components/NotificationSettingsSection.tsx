@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { Bell, Loader2 } from "lucide-react";
+import { Bell, Loader2, Send } from "lucide-react";
 import { useBranding } from "@/hooks/useBranding";
 import { toast } from "sonner";
 
@@ -24,6 +24,17 @@ export const NotificationSettingsSection = () => {
   const [disabledText, setDisabledText] = useState("");
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  const [testing, setTesting] = useState<string | null>(null);
+
+  const testBot = async (kind: "payments" | "signups" | "inactive") => {
+    setTesting(kind);
+    const { data, error } = await supabase.functions.invoke("notify-test", { body: { kind } });
+    setTesting(null);
+    if (error) return toast.error(error.message);
+    if (data?.ok) return toast.success("Mensaje de prueba enviado a Telegram");
+    toast.error(data?.error ?? "No se pudo enviar el mensaje de prueba");
+  };
+
 
   useEffect(() => {
     const load = async () => {
@@ -107,10 +118,28 @@ export const NotificationSettingsSection = () => {
             />
           </div>
 
-          <Button onClick={save} disabled={saving}>
-            {saving ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : null}
-            Guardar
-          </Button>
+          <div className="flex flex-wrap gap-2 pt-4 border-t">
+            <Button onClick={save} disabled={saving}>
+              {saving ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : null}
+              Guardar
+            </Button>
+            {([
+              { kind: "payments", label: "Probar bot de pagos" },
+              { kind: "signups", label: "Probar bot de registros" },
+              { kind: "inactive", label: "Probar bot de inactivas" },
+            ] as const).map(({ kind, label }) => (
+              <Button
+                key={kind}
+                variant="outline"
+                disabled={testing === kind}
+                onClick={() => testBot(kind)}
+              >
+                {testing === kind ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : <Send className="h-4 w-4 mr-2" />}
+                {label}
+              </Button>
+            ))}
+          </div>
+
         </div>
       )}
     </Card>
