@@ -586,7 +586,38 @@ const CaseDetail = () => {
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
+      {/* File viewer */}
+      <Dialog open={!!viewer} onOpenChange={(o) => { if (!o) closeViewer(); }}>
+        <DialogContent className="max-w-4xl w-[95vw] p-0 gap-0">
+          <DialogHeader className="p-4 pb-2">
+            <DialogTitle className="font-serif text-lg truncate pr-8">{viewer?.name}</DialogTitle>
+          </DialogHeader>
+          <div className="px-4 pb-2 flex flex-wrap gap-2">
+            <Button size="sm" variant="outline" onClick={printViewer}><Eye className="h-4 w-4 mr-1" />Abrir / Imprimir</Button>
+            {viewer && (
+              <Button asChild size="sm" variant="outline">
+                <a href={viewer.url} download={viewer.name}><Download className="h-4 w-4 mr-1" />Descargar</a>
+              </Button>
+            )}
+          </div>
+          <div className="bg-muted/40 h-[70vh] overflow-auto flex items-start justify-center">
+            {viewer && (
+              viewer.mime.startsWith("image/") ? (
+                <img src={viewer.url} alt={viewer.name} className="max-w-full h-auto" />
+              ) : viewer.mime === "application/pdf" ? (
+                <iframe src={viewer.url} title={viewer.name} className="w-full h-full border-0" />
+              ) : (
+                <div className="p-8 text-center text-sm text-muted-foreground">
+                  Este formato no se puede previsualizar en el navegador. Descárguelo para verlo.
+                </div>
+              )
+            )}
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
+
   );
 };
 
