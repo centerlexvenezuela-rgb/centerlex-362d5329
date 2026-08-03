@@ -54,9 +54,26 @@ const Cases = () => {
     load();
   };
 
-  const filtered = cases.filter(c =>
-    !q || c.case_number.toLowerCase().includes(q.toLowerCase()) || c.title.toLowerCase().includes(q.toLowerCase()) || c.clients?.full_name.toLowerCase().includes(q.toLowerCase())
-  );
+const term = q.trim().toLowerCase();
+  const digits = term.replace(/\D/g, "");
+  const cedulaOf = (c: CaseRow) => (c.clients?.cedula || "").toLowerCase();
+  const cedulaMatch = (c: CaseRow) => {
+    const ced = cedulaOf(c);
+    if (!term) return false;
+    if (ced.includes(term)) return true;
+    return !!digits && ced.replace(/\D/g, "").includes(digits);
+  };
+  const filtered = cases
+    .filter((c) =>
+      !term ||
+      cedulaMatch(c) ||
+      (c.clients?.full_name || "").toLowerCase().includes(term) ||
+      c.case_number.toLowerCase().includes(term) ||
+      c.title.toLowerCase().includes(term)
+    )
+    // la cédula es el criterio principal: esos resultados van primero
+    .sort((a, b) => Number(cedulaMatch(b)) - Number(cedulaMatch(a)));
+
 
   const statusColor: Record<string, string> = {
     open: "bg-accent/20 text-accent-foreground border-accent/30",
