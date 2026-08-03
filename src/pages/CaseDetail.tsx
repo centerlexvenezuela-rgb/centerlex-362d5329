@@ -81,6 +81,8 @@ const CaseDetail = () => {
   const [docs, setDocs] = useState<Doc[]>([]);
   const [filter, setFilter] = useState<"all" | DocKind>("all");
   const [expanded, setExpanded] = useState<Record<string, boolean>>({});
+  const [viewer, setViewer] = useState<{ url: string; mime: string; name: string } | null>(null);
+
 
   // Writing editor
   const [editorOpen, setEditorOpen] = useState(false);
@@ -326,15 +328,32 @@ const CaseDetail = () => {
       const res = await fetch(`${SUPABASE_URL}/functions/v1/google-drive/file?fileId=${d.drive_file_id}`,
         { headers: { Authorization: `Bearer ${session.access_token}`, apikey: SUPABASE_ANON } });
       if (!res.ok) throw new Error("No se pudo descargar el archivo");
-      const blob = await res.blob(); const url = URL.createObjectURL(blob);
+      const raw = await res.blob();
+      const mime = d.mime_type || raw.type || "application/octet-stream";
+      const blob = new Blob([raw], { type: mime });
+      const url = URL.createObjectURL(blob);
       if (download) {
         const a = document.createElement("a");
         a.href = url; a.download = d.file_name || d.title;
         document.body.appendChild(a); a.click(); a.remove();
-      } else { window.open(url, "_blank"); }
-      setTimeout(() => URL.revokeObjectURL(url), 60_000);
+        setTimeout(() => URL.revokeObjectURL(url), 60_000);
+      } else {
+        setViewer((prev) => { if (prev) URL.revokeObjectURL(prev.url); return { url, mime, name: d.file_name || d.title }; });
+      }
     } catch (e: any) { toast.error(e.message || "Error abriendo archivo"); }
   };
+
+  const closeViewer = () => {
+    setViewer((prev) => { if (prev) URL.revokeObjectURL(prev.url); return null; });
+  };
+
+  const printViewer = () => {
+    if (!viewer) return;
+    const w = window.open(viewer.url, "_blank");
+    if (!w) return toast.error("Permita las ventanas emergentes para imprimir");
+    w.addEventListener("load", () => w.print());
+  };
+
 
   const filtered = useMemo(
     () => filter === "all" ? docs : docs.filter((d) => d.kind === filter),
@@ -567,7 +586,38 @@ const CaseDetail = () => {
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
+      {/* File viewer */}
+      <Dialog open={!!viewer} onOpenChange={(o) => { if (!o) closeViewer(); }}>
+        <DialogContent className="max-w-4xl w-[95vw] p-0 gap-0">
+          <DialogHeader className="p-4 pb-2">
+            <DialogTitle className="font-serif text-lg truncate pr-8">{viewer?.name}</DialogTitle>
+          </DialogHeader>
+          <div className="px-4 pb-2 flex flex-wrap gap-2">
+            <Button size="sm" variant="outline" onClick={printViewer}><Eye className="h-4 w-4 mr-1" />Abrir / Imprimir</Button>
+            {viewer && (
+              <Button asChild size="sm" variant="outline">
+                <a href={viewer.url} download={viewer.name}><Download className="h-4 w-4 mr-1" />Descargar</a>
+              </Button>
+            )}
+          </div>
+          <div className="bg-muted/40 h-[70vh] overflow-auto flex items-start justify-center">
+            {viewer && (
+              viewer.mime.startsWith("image/") ? (
+                <img src={viewer.url} alt={viewer.name} className="max-w-full h-auto" />
+              ) : viewer.mime === "application/pdf" ? (
+                <iframe src={viewer.url} title={viewer.name} className="w-full h-full border-0" />
+              ) : (
+                <div className="p-8 text-center text-sm text-muted-foreground">
+                  Este formato no se puede previsualizar en el navegador. Descárguelo para verlo.
+                </div>
+              )
+            )}
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
+
   );
 };
 

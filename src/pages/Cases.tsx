@@ -54,9 +54,26 @@ const Cases = () => {
     load();
   };
 
-  const filtered = cases.filter(c =>
-    !q || c.case_number.toLowerCase().includes(q.toLowerCase()) || c.title.toLowerCase().includes(q.toLowerCase()) || c.clients?.full_name.toLowerCase().includes(q.toLowerCase())
-  );
+const term = q.trim().toLowerCase();
+  const digits = term.replace(/\D/g, "");
+  const cedulaOf = (c: CaseRow) => (c.clients?.cedula || "").toLowerCase();
+  const cedulaMatch = (c: CaseRow) => {
+    const ced = cedulaOf(c);
+    if (!term) return false;
+    if (ced.includes(term)) return true;
+    return !!digits && ced.replace(/\D/g, "").includes(digits);
+  };
+  const filtered = cases
+    .filter((c) =>
+      !term ||
+      cedulaMatch(c) ||
+      (c.clients?.full_name || "").toLowerCase().includes(term) ||
+      c.case_number.toLowerCase().includes(term) ||
+      c.title.toLowerCase().includes(term)
+    )
+    // la cédula es el criterio principal: esos resultados van primero
+    .sort((a, b) => Number(cedulaMatch(b)) - Number(cedulaMatch(a)));
+
 
   const statusColor: Record<string, string> = {
     open: "bg-accent/20 text-accent-foreground border-accent/30",
@@ -113,8 +130,9 @@ const Cases = () => {
 
       <div className="relative max-w-md">
         <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-        <Input placeholder="Buscar por número, título o cliente..." value={q} onChange={(e) => setQ(e.target.value)} className="pl-9" />
+        <Input placeholder="Buscar por cédula del cliente (o nombre, número, título)..." value={q} onChange={(e) => setQ(e.target.value)} className="pl-9" />
       </div>
+
 
       {filtered.length === 0 ? (
         <Card className="p-12 text-center text-muted-foreground">{cases.length === 0 ? "Aún no hay expedientes." : "Sin resultados."}</Card>
