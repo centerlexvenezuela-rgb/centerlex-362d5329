@@ -326,15 +326,32 @@ const CaseDetail = () => {
       const res = await fetch(`${SUPABASE_URL}/functions/v1/google-drive/file?fileId=${d.drive_file_id}`,
         { headers: { Authorization: `Bearer ${session.access_token}`, apikey: SUPABASE_ANON } });
       if (!res.ok) throw new Error("No se pudo descargar el archivo");
-      const blob = await res.blob(); const url = URL.createObjectURL(blob);
+      const raw = await res.blob();
+      const mime = d.mime_type || raw.type || "application/octet-stream";
+      const blob = new Blob([raw], { type: mime });
+      const url = URL.createObjectURL(blob);
       if (download) {
         const a = document.createElement("a");
         a.href = url; a.download = d.file_name || d.title;
         document.body.appendChild(a); a.click(); a.remove();
-      } else { window.open(url, "_blank"); }
-      setTimeout(() => URL.revokeObjectURL(url), 60_000);
+        setTimeout(() => URL.revokeObjectURL(url), 60_000);
+      } else {
+        setViewer((prev) => { if (prev) URL.revokeObjectURL(prev.url); return { url, mime, name: d.file_name || d.title }; });
+      }
     } catch (e: any) { toast.error(e.message || "Error abriendo archivo"); }
   };
+
+  const closeViewer = () => {
+    setViewer((prev) => { if (prev) URL.revokeObjectURL(prev.url); return null; });
+  };
+
+  const printViewer = () => {
+    if (!viewer) return;
+    const w = window.open(viewer.url, "_blank");
+    if (!w) return toast.error("Permita las ventanas emergentes para imprimir");
+    w.addEventListener("load", () => w.print());
+  };
+
 
   const filtered = useMemo(
     () => filter === "all" ? docs : docs.filter((d) => d.kind === filter),
