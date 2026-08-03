@@ -81,6 +81,8 @@ const CaseDetail = () => {
   const [docs, setDocs] = useState<Doc[]>([]);
   const [filter, setFilter] = useState<"all" | DocKind>("all");
   const [expanded, setExpanded] = useState<Record<string, boolean>>({});
+  const [viewer, setViewer] = useState<{ url: string; mime: string; name: string } | null>(null);
+
 
   // Writing editor
   const [editorOpen, setEditorOpen] = useState(false);
