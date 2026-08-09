@@ -355,7 +355,7 @@ const AdminPanel = () => {
               onTogglePrestaciones={handleTogglePrestaciones}
               onToggleIslr={handleToggleIslr}
               onToggleDirectory={handleToggleDirectory}
-              onEdit={setEditing}
+              onEdit={(l) => setEditing(l as Lawyer)}
               onDelete={handleDelete}
             />
             <div className="hidden md:block overflow-x-auto">
