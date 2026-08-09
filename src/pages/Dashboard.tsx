@@ -5,7 +5,7 @@ import { useProfile } from "@/hooks/useProfile";
 import { useAuth } from "@/hooks/useAuth";
 import { Card } from "@/components/ui/card";
 import { ReportPaymentDialog } from "@/components/ReportPaymentDialog";
-import { Users, Calendar, FolderOpen, MessageSquare, ArrowRight, Calculator } from "lucide-react";
+import { Users, Calendar, FolderOpen, MessageSquare, ArrowRight, Calculator, IdCard } from "lucide-react";
 
 const Dashboard = () => {
   const [stats, setStats] = useState({ clients: 0, cases: 0, today: 0 });
@@ -44,6 +44,9 @@ const Dashboard = () => {
     ...baseCards,
     ...(profile?.fees_enabled
       ? [{ to: "/honorarios", title: "Honorarios", icon: Calculator, desc: "Tarifas mínimas FCAV", value: "—" as any }]
+      : []),
+    ...(profile?.directory_enabled
+      ? [{ to: "/mi-directorio", title: "Directorio", icon: IdCard, desc: "Mis datos públicos", value: "—" as any }]
       : []),
     ...(profile?.ai_enabled
       ? [{ to: "/asistente", title: "Asistente IA", icon: MessageSquare, desc: "Consulta jurídica", value: "—" as any }]
