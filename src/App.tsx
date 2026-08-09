@@ -28,6 +28,7 @@ import Fees from "./pages/Fees";
 import Prestaciones from "./pages/Prestaciones";
 import Islr from "./pages/Islr";
 import Directory from "./pages/Directory";
+import DirectoryProfile from "./pages/DirectoryProfile";
 import NotFound from "./pages/NotFound.tsx";
 import Privacy from "./pages/Privacy";
 import Terms from "./pages/Terms";
@@ -73,6 +74,7 @@ const App = () => (
               <Route path="/honorarios" element={<Fees />} />
               <Route path="/prestaciones" element={<Prestaciones />} />
               <Route path="/islr" element={<Islr />} />
+              <Route path="/mi-directorio" element={<DirectoryProfile />} />
               <Route path="/cuenta" element={<Settings />} />
             </Route>
             <Route path="*" element={<NotFound />} />
