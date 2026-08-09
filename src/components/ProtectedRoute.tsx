@@ -10,10 +10,15 @@ interface Props {
 }
 
 export const ProtectedRoute = ({ children, requireRole = "lawyer", redirectTo }: Props) => {
-  const { session, role, loading } = useAuth();
+  const { session, role, loading, roleLoading } = useAuth();
   const { profile, loading: profileLoading } = useProfile();
 
-  if (loading || (session && requireRole === "lawyer" && profileLoading)) {
+  const waiting =
+    loading ||
+    (session && roleLoading) ||
+    (session && requireRole === "lawyer" && profileLoading);
+
+  if (waiting) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-background">
         <Scale className="h-10 w-10 text-accent animate-pulse" />
@@ -25,8 +30,8 @@ export const ProtectedRoute = ({ children, requireRole = "lawyer", redirectTo }:
     return <Navigate to={redirectTo ?? (requireRole === "admin" ? "/admin/login" : "/auth")} replace />;
   }
 
+  // Solo redirigimos cuando el rol ya está resuelto y no coincide
   if (role && role !== requireRole) {
-    // logged in but wrong role
     return <Navigate to={requireRole === "admin" ? "/admin/login" : "/auth"} replace />;
   }
 
