@@ -1,6 +1,8 @@
 import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
+import { fetchUserRole } from "@/hooks/useAuth";
+
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -22,20 +24,17 @@ const AdminAuth = () => {
       setLoading(false);
       return toast.error(error.message);
     }
-    const { data: roleData } = await supabase
-      .from("user_roles")
-      .select("role")
-      .eq("user_id", data.user.id)
-      .maybeSingle();
+    const role = await fetchUserRole(data.user.id);
     setLoading(false);
 
-    if (roleData?.role === "admin") {
+    if (role === "admin") {
       toast.success("Bienvenido, administrador");
       navigate("/admin");
     } else {
       await supabase.auth.signOut();
       toast.error("Esta cuenta no tiene privilegios de administrador.");
     }
+
   };
 
   return (
