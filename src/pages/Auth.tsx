@@ -2,6 +2,8 @@ import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useBranding } from "@/hooks/useBranding";
+import { fetchUserRole } from "@/hooks/useAuth";
+
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -27,21 +29,20 @@ const Auth = () => {
       setLoading(false);
       return toast.error(error.message);
     }
-    // Verificar rol
-    const { data: roleData } = await supabase
-      .from("user_roles")
-      .select("role")
-      .eq("user_id", data.user.id)
-      .maybeSingle();
+    // Verificar rol (con reintentos para evitar fallos por carrera de red)
+    const role = await fetchUserRole(data.user.id);
     setLoading(false);
 
-    if (roleData?.role === "lawyer") {
+    if (role === "lawyer") {
       toast.success("Sesión iniciada");
       navigate("/app");
+    } else if (role === "admin") {
+      navigate("/admin");
     } else {
       await supabase.auth.signOut();
       toast.error("Esta cuenta no tiene acceso de abogado. Contacte al administrador.");
     }
+
   };
 
   return (
