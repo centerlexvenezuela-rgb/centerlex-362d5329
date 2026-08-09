@@ -21,6 +21,7 @@ const empty: LawyerProfile = {
   fees_enabled: false,
   prestaciones_enabled: false,
   islr_enabled: false,
+  directory_enabled: false,
   account_active: true,
   trial_ends_at: null,
 };
@@ -49,7 +50,7 @@ export const useProfile = () => {
       const { data } = await supabase
         .from("profiles")
         .select(
-          "first_name, last_name, ai_enabled, fees_enabled, prestaciones_enabled, islr_enabled, account_active, trial_ends_at",
+          "first_name, last_name, ai_enabled, fees_enabled, prestaciones_enabled, islr_enabled, directory_enabled, account_active, trial_ends_at",
         )
         .eq("user_id", user.id)
         .maybeSingle();
