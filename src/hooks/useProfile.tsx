@@ -9,6 +9,7 @@ export interface LawyerProfile {
   fees_enabled: boolean;
   prestaciones_enabled: boolean;
   islr_enabled: boolean;
+  directory_enabled: boolean;
   account_active: boolean;
   trial_ends_at: string | null;
 }
