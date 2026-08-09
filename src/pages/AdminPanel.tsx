@@ -29,6 +29,8 @@ import { BackupSection } from "@/components/BackupSection";
 import { AdminQueuesSection } from "@/components/AdminQueuesSection";
 import { NotificationSettingsSection } from "@/components/NotificationSettingsSection";
 import { EditLawyerDialog } from "@/components/EditLawyerDialog";
+import { LawyerMobileList } from "@/components/LawyerMobileList";
+
 import { VENEZUELA_STATES } from "@/lib/venezuela";
 import { toast } from "sonner";
 
@@ -343,7 +345,21 @@ const AdminPanel = () => {
               Aún no hay abogados registrados.
             </p>
           ) : (
-            <div className="overflow-x-auto">
+            <>
+            <LawyerMobileList
+              lawyers={lawyers}
+              togglingId={togglingId}
+              onToggleActive={handleToggleActive}
+              onToggleAI={handleToggleAI}
+              onToggleFees={handleToggleFees}
+              onTogglePrestaciones={handleTogglePrestaciones}
+              onToggleIslr={handleToggleIslr}
+              onToggleDirectory={handleToggleDirectory}
+              onEdit={setEditing}
+              onDelete={handleDelete}
+            />
+            <div className="hidden md:block overflow-x-auto">
+
               <Table>
                 <TableHeader>
                   <TableRow>
@@ -508,7 +524,9 @@ const AdminPanel = () => {
                 </TableBody>
               </Table>
             </div>
+            </>
           )}
+
         </Card>
 
         <FeesAdminSection />
