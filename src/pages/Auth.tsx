@@ -79,7 +79,7 @@ const Auth = () => {
             del derecho.
           </h2>
           <p className="text-primary-foreground/70 max-w-md">
-            Acceso exclusivo para abogados autorizados por la administración del despacho.
+            Acceso exclusivo para abogados autorizados por la administración.
           </p>
         </div>
         <div className="relative text-xs text-primary-foreground/50">
