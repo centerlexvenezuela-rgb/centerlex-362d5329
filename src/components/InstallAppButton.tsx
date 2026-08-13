@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { ReactNode, useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Download } from "lucide-react";
 
@@ -7,7 +7,7 @@ type InstallPromptEvent = Event & {
   userChoice: Promise<{ outcome: "accepted" | "dismissed" }>;
 };
 
-export const InstallAppButton = () => {
+export const InstallAppButton = ({ fallback = null }: { fallback?: ReactNode }) => {
   const [deferredPrompt, setDeferredPrompt] = useState<InstallPromptEvent | null>(null);
   const [installed, setInstalled] = useState(false);
 
@@ -34,7 +34,7 @@ export const InstallAppButton = () => {
     };
   }, []);
 
-  if (installed || !deferredPrompt) return null;
+  if (installed || !deferredPrompt) return <>{fallback}</>;
 
   const handleClick = async () => {
     await deferredPrompt.prompt();

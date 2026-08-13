@@ -88,12 +88,15 @@ const Landing = () => {
             <Button asChild variant="ghost" size="sm" className="hidden sm:inline-flex">
               <Link to="/directorio">Directorio</Link>
             </Button>
-            <InstallAppButton />
-            <Button asChild variant="outline" size="sm">
-              <Link to="/auth">
-                <LogIn className="h-4 w-4 mr-1.5" /> {c.header_login_button}
-              </Link>
-            </Button>
+            <InstallAppButton
+              fallback={
+                <Button asChild variant="outline" size="sm">
+                  <Link to="/auth">
+                    <LogIn className="h-4 w-4 mr-1.5" /> {c.header_login_button}
+                  </Link>
+                </Button>
+              }
+            />
           </div>
         </div>
       </header>
