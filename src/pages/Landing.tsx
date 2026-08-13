@@ -5,6 +5,7 @@ import { useBranding, interpolate } from "@/hooks/useBranding";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { ReportPaymentDialog } from "@/components/ReportPaymentDialog";
+import { InstallAppButton } from "@/components/InstallAppButton";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
@@ -87,6 +88,7 @@ const Landing = () => {
             <Button asChild variant="ghost" size="sm" className="hidden sm:inline-flex">
               <Link to="/directorio">Directorio</Link>
             </Button>
+            <InstallAppButton />
             <Button asChild variant="outline" size="sm">
               <Link to="/auth">
                 <LogIn className="h-4 w-4 mr-1.5" /> {c.header_login_button}
