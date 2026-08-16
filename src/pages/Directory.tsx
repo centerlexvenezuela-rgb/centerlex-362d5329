@@ -14,7 +14,7 @@ import { useBranding } from "@/hooks/useBranding";
 import { toast } from "sonner";
 
 interface Lawyer {
-  user_id: string;
+  entry_id: string;
   first_name: string | null;
   last_name: string | null;
   whatsapp: string | null;
