@@ -186,7 +186,7 @@ const Directory = () => {
                 .toUpperCase();
               const wa = l.whatsapp?.replace(/\D/g, "");
               return (
-                <Card key={l.user_id} className="p-5 hover:shadow-elegant transition-shadow flex flex-col">
+                <Card key={l.entry_id} className="p-5 hover:shadow-elegant transition-shadow flex flex-col">
                   <div className="flex items-start gap-4 mb-4">
                     <Avatar className="h-16 w-16">
                       {l.photo_url ? <AvatarImage src={l.photo_url} alt={fullName} /> : null}
