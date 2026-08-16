@@ -28,6 +28,7 @@ import { PrestacionesAdminSection } from "@/components/PrestacionesAdminSection"
 import { BackupSection } from "@/components/BackupSection";
 import { AdminQueuesSection } from "@/components/AdminQueuesSection";
 import { NotificationSettingsSection } from "@/components/NotificationSettingsSection";
+import { DirectoryLawyersSection } from "@/components/DirectoryLawyersSection";
 import { EditLawyerDialog } from "@/components/EditLawyerDialog";
 import { LawyerMobileList } from "@/components/LawyerMobileList";
 
