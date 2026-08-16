@@ -22,7 +22,6 @@ interface Lawyer {
   city: string | null;
   state: string | null;
   photo_url: string | null;
-  email: string | null;
 }
 
 const Directory = () => {
