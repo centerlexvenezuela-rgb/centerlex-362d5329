@@ -529,6 +529,8 @@ const AdminPanel = () => {
 
         </Card>
 
+        <DirectoryLawyersSection />
+
         <FeesAdminSection />
 
         <PrestacionesAdminSection />
