@@ -222,6 +222,48 @@ export type Database = {
         }
         Relationships: []
       }
+      directory_lawyers: {
+        Row: {
+          bar_association: string | null
+          city: string | null
+          created_at: string
+          first_name: string | null
+          id: string
+          last_name: string | null
+          photo_url: string | null
+          published: boolean
+          state: string | null
+          updated_at: string
+          whatsapp: string | null
+        }
+        Insert: {
+          bar_association?: string | null
+          city?: string | null
+          created_at?: string
+          first_name?: string | null
+          id?: string
+          last_name?: string | null
+          photo_url?: string | null
+          published?: boolean
+          state?: string | null
+          updated_at?: string
+          whatsapp?: string | null
+        }
+        Update: {
+          bar_association?: string | null
+          city?: string | null
+          created_at?: string
+          first_name?: string | null
+          id?: string
+          last_name?: string | null
+          photo_url?: string | null
+          published?: boolean
+          state?: string | null
+          updated_at?: string
+          whatsapp?: string | null
+        }
+        Relationships: []
+      }
       documents: {
         Row: {
           case_id: string
@@ -625,35 +667,13 @@ export type Database = {
         Row: {
           bar_association: string | null
           city: string | null
-          email: string | null
+          entry_id: string | null
           first_name: string | null
           last_name: string | null
           photo_url: string | null
+          source: string | null
           state: string | null
-          user_id: string | null
           whatsapp: string | null
-        }
-        Insert: {
-          bar_association?: string | null
-          city?: string | null
-          email?: string | null
-          first_name?: string | null
-          last_name?: string | null
-          photo_url?: string | null
-          state?: string | null
-          user_id?: string | null
-          whatsapp?: string | null
-        }
-        Update: {
-          bar_association?: string | null
-          city?: string | null
-          email?: string | null
-          first_name?: string | null
-          last_name?: string | null
-          photo_url?: string | null
-          state?: string | null
-          user_id?: string | null
-          whatsapp?: string | null
         }
         Relationships: []
       }
