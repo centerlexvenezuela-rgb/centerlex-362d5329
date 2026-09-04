@@ -32,6 +32,9 @@ export interface LandingContent {
   footer_text: string;
   directory_button_label: string;
   directory_button_url: string;
+  install_button_label: string;
+  install_button_url: string;
+
 }
 
 export const defaultLandingContent: LandingContent = {
