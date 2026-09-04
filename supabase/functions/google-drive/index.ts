@@ -323,8 +323,17 @@ Deno.serve(async (req) => {
     const action = body.action || url.searchParams.get("action");
 
     if (action === "auth-url") {
-      // The Authorization header IS our state (user JWT)
-      const state = req.headers.get("Authorization")!.replace("Bearer ", "");
+      // Opaque, single-use state stored server-side (never expose the user JWT in a URL)
+      const state = crypto.randomUUID() + crypto.randomUUID().replace(/-/g, "");
+      const sbAdmin = admin();
+      await sbAdmin.from("google_oauth_states").delete().lt(
+        "created_at",
+        new Date(Date.now() - 15 * 60 * 1000).toISOString(),
+      );
+      const { error: stateErr } = await sbAdmin
+        .from("google_oauth_states")
+        .insert({ state, user_id: user.id });
+      if (stateErr) return json({ error: "No se pudo iniciar la conexión" }, 500);
       const params = new URLSearchParams({
         client_id: GOOGLE_CLIENT_ID,
         redirect_uri: REDIRECT_URI,
