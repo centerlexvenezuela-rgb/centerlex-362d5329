@@ -46,6 +46,16 @@ export const InstallAppButton = ({
     };
   }, []);
 
+  if (href) {
+    return (
+      <Button asChild variant="outline" size="sm">
+        <a href={href} target="_blank" rel="noopener noreferrer">
+          <Download className="h-4 w-4 mr-1.5" /> {text}
+        </a>
+      </Button>
+    );
+  }
+
   if (installed) return null;
 
   const handleClick = async () => {
@@ -62,8 +72,9 @@ export const InstallAppButton = ({
   return (
     <>
       <Button onClick={handleClick} variant="outline" size="sm">
-        <Download className="h-4 w-4 mr-1.5" /> Descargar App
+        <Download className="h-4 w-4 mr-1.5" /> {text}
       </Button>
+
 
       <Dialog open={helpOpen} onOpenChange={setHelpOpen}>
         <DialogContent className="max-w-md">
