@@ -70,7 +70,7 @@ export const defaultLandingContent: LandingContent = {
   contact_success_message: "Mensaje enviado. Nos pondremos en contacto pronto.",
   footer_text: "© {year} {app_title} — {app_subtitle}",
   directory_button_label: "",
-  directory_button_label: "",
+
   directory_button_url: "",
   install_button_label: "Descargar App",
   install_button_url: "",
