@@ -7,7 +7,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
   Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
 } from "@/components/ui/select";
-import { Scale, MapPin, Phone, Search, Loader2, Locate } from "lucide-react";
+import { Scale, MapPin, Phone, Search, Loader2, Locate, ExternalLink } from "lucide-react";
 import { VENEZUELA_STATES, nearestState } from "@/lib/venezuela";
 import { useBranding } from "@/hooks/useBranding";
 import { toast } from "sonner";
@@ -30,6 +30,9 @@ const Directory = () => {
   const [search, setSearch] = useState("");
   const [stateFilter, setStateFilter] = useState<string>("all");
   const [locating, setLocating] = useState(false);
+  const ctaLabel = (branding.landing_content.directory_button_label ?? "").trim();
+  const rawUrl = (branding.landing_content.directory_button_url ?? "").trim();
+  const ctaUrl = rawUrl && !/^https?:\/\//i.test(rawUrl) ? `https://${rawUrl}` : rawUrl;
 
   useEffect(() => {
     document.title = "Directorio de Abogados en Venezuela | " + branding.app_title;
@@ -102,7 +105,7 @@ const Directory = () => {
     <div className="min-h-screen bg-background">
       <header className="border-b bg-card/80 backdrop-blur sticky top-0 z-50">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 py-3 flex items-center justify-between gap-4">
-          <Link to="/" className="flex items-center gap-3 min-w-0">
+          <div className="flex items-center gap-3 min-w-0">
             <div className={`h-10 w-10 rounded flex items-center justify-center overflow-hidden flex-shrink-0 ${branding.logo_url ? "" : "bg-gradient-gold shadow-gold"}`}>
               {branding.logo_url ? (
                 <img src={branding.logo_url} alt={branding.app_title} className="h-full w-full object-contain" />
@@ -114,10 +117,15 @@ const Directory = () => {
               <h1 className="font-serif text-base sm:text-lg leading-tight truncate">{branding.app_title}</h1>
               <p className="text-[10px] sm:text-xs text-muted-foreground truncate">Directorio profesional</p>
             </div>
-          </Link>
-          <Button asChild variant="outline" size="sm">
-            <Link to="/"><ArrowLeft className="h-4 w-4 mr-1.5" /> Inicio</Link>
-          </Button>
+          </div>
+          {ctaLabel && ctaUrl && (
+            <Button asChild variant="outline" size="sm">
+              <a href={ctaUrl} target="_blank" rel="noopener noreferrer">
+                {ctaLabel}
+                <ExternalLink className="h-4 w-4 ml-1.5" />
+              </a>
+            </Button>
+          )}
         </div>
       </header>
 

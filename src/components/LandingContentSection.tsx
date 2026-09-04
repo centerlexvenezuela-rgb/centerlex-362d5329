@@ -76,6 +76,15 @@ const groups: Group[] = [
     ],
   },
   {
+    title: "Directorio de abogados",
+    description:
+      "Botón que aparece a la derecha del encabezado de la página del directorio. Se abre en una pestaña nueva. Déjelo vacío para ocultarlo.",
+    fields: [
+      { key: "directory_button_label", label: "Texto del botón" },
+      { key: "directory_button_url", label: "Enlace (URL)", hint: "Ej.: https://ejemplo.com" },
+    ],
+  },
+  {
     title: "Pie de página",
     description: "Soporta {year}, {app_title} y {app_subtitle}.",
     fields: [{ key: "footer_text", label: "Texto del pie de página" }],
