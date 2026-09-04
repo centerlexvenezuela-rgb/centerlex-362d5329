@@ -30,6 +30,8 @@ export interface LandingContent {
   contact_submit_label: string;
   contact_success_message: string;
   footer_text: string;
+  directory_button_label: string;
+  directory_button_url: string;
 }
 
 export const defaultLandingContent: LandingContent = {
@@ -64,6 +66,8 @@ export const defaultLandingContent: LandingContent = {
   contact_submit_label: "Enviar solicitud",
   contact_success_message: "Mensaje enviado. Nos pondremos en contacto pronto.",
   footer_text: "© {year} {app_title} — {app_subtitle}",
+  directory_button_label: "",
+  directory_button_url: "",
 };
 
 export interface Branding {
