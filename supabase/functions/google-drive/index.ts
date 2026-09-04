@@ -242,7 +242,7 @@ Deno.serve(async (req) => {
     // ---- OAuth callback (browser redirect from Google) ----
     if (path === "/callback") {
       const code = url.searchParams.get("code");
-      const state = url.searchParams.get("state"); // = user JWT
+      const state = url.searchParams.get("state"); // opaque, single-use
       const errorParam = url.searchParams.get("error");
       const origin = url.searchParams.get("origin_url") || "";
 
