@@ -10,10 +10,18 @@ type InstallPromptEvent = Event & {
   userChoice: Promise<{ outcome: "accepted" | "dismissed" }>;
 };
 
-export const InstallAppButton = () => {
+export const InstallAppButton = ({
+  label = "Descargar App",
+  url = "",
+}: { label?: string; url?: string }) => {
   const [deferredPrompt, setDeferredPrompt] = useState<InstallPromptEvent | null>(null);
   const [installed, setInstalled] = useState(false);
   const [helpOpen, setHelpOpen] = useState(false);
+  const text = label?.trim() || "Descargar App";
+  const href = url?.trim()
+    ? (/^https?:\/\//i.test(url.trim()) ? url.trim() : `https://${url.trim()}`)
+    : "";
+
 
   useEffect(() => {
     const standalone =
@@ -38,6 +46,16 @@ export const InstallAppButton = () => {
     };
   }, []);
 
+  if (href) {
+    return (
+      <Button asChild variant="outline" size="sm">
+        <a href={href} target="_blank" rel="noopener noreferrer">
+          <Download className="h-4 w-4 mr-1.5" /> {text}
+        </a>
+      </Button>
+    );
+  }
+
   if (installed) return null;
 
   const handleClick = async () => {
@@ -54,8 +72,9 @@ export const InstallAppButton = () => {
   return (
     <>
       <Button onClick={handleClick} variant="outline" size="sm">
-        <Download className="h-4 w-4 mr-1.5" /> Descargar App
+        <Download className="h-4 w-4 mr-1.5" /> {text}
       </Button>
+
 
       <Dialog open={helpOpen} onOpenChange={setHelpOpen}>
         <DialogContent className="max-w-md">

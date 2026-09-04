@@ -85,6 +85,16 @@ const groups: Group[] = [
     ],
   },
   {
+    title: "Botón «Descargar App» (encabezado de inicio)",
+    description:
+      "Texto y enlace del botón en la parte superior derecha de la página de inicio. Se abre en una pestaña nueva. Si deja el enlace vacío, el botón intentará instalar la aplicación (PWA).",
+    fields: [
+      { key: "install_button_label", label: "Texto del botón" },
+      { key: "install_button_url", label: "Enlace (URL)", hint: "Ej.: https://ejemplo.com/app.apk" },
+    ],
+  },
+
+  {
     title: "Pie de página",
     description: "Soporta {year}, {app_title} y {app_subtitle}.",
     fields: [{ key: "footer_text", label: "Texto del pie de página" }],
