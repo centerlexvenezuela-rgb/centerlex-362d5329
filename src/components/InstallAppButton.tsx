@@ -10,10 +10,18 @@ type InstallPromptEvent = Event & {
   userChoice: Promise<{ outcome: "accepted" | "dismissed" }>;
 };
 
-export const InstallAppButton = () => {
+export const InstallAppButton = ({
+  label = "Descargar App",
+  url = "",
+}: { label?: string; url?: string }) => {
   const [deferredPrompt, setDeferredPrompt] = useState<InstallPromptEvent | null>(null);
   const [installed, setInstalled] = useState(false);
   const [helpOpen, setHelpOpen] = useState(false);
+  const text = label?.trim() || "Descargar App";
+  const href = url?.trim()
+    ? (/^https?:\/\//i.test(url.trim()) ? url.trim() : `https://${url.trim()}`)
+    : "";
+
 
   useEffect(() => {
     const standalone =
