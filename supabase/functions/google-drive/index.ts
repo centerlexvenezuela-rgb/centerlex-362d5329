@@ -242,7 +242,7 @@ Deno.serve(async (req) => {
     // ---- OAuth callback (browser redirect from Google) ----
     if (path === "/callback") {
       const code = url.searchParams.get("code");
-      const state = url.searchParams.get("state"); // = user JWT
+      const state = url.searchParams.get("state"); // opaque, single-use
       const errorParam = url.searchParams.get("error");
       const origin = url.searchParams.get("origin_url") || "";
 
@@ -255,11 +255,18 @@ Deno.serve(async (req) => {
       if (errorParam) return new Response(closeHtml(errorParam, false), { headers: { "Content-Type": "text/html" } });
       if (!code || !state) return new Response(closeHtml("Faltan parámetros", false), { headers: { "Content-Type": "text/html" } });
 
-      // verify state (= user JWT)
-      const sb = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-      const { data: claims } = await sb.auth.getClaims(state);
-      const userId = claims?.claims?.sub as string | undefined;
-      if (!userId) return new Response(closeHtml("Sesión inválida", false), { headers: { "Content-Type": "text/html" } });
+      // resolve + consume the single-use state stored server-side
+      const sbAdmin = admin();
+      const { data: stateRow } = await sbAdmin
+        .from("google_oauth_states")
+        .select("user_id, created_at")
+        .eq("state", state)
+        .maybeSingle();
+      await sbAdmin.from("google_oauth_states").delete().eq("state", state);
+      const fresh = stateRow &&
+        Date.now() - new Date(stateRow.created_at as string).getTime() < 15 * 60 * 1000;
+      const userId = fresh ? (stateRow!.user_id as string) : undefined;
+      if (!userId) return new Response(closeHtml("Sesión inválida o expirada", false), { headers: { "Content-Type": "text/html" } });
 
       const tok = await exchangeCode(code);
       if (!tok.refresh_token) {
@@ -323,8 +330,17 @@ Deno.serve(async (req) => {
     const action = body.action || url.searchParams.get("action");
 
     if (action === "auth-url") {
-      // The Authorization header IS our state (user JWT)
-      const state = req.headers.get("Authorization")!.replace("Bearer ", "");
+      // Opaque, single-use state stored server-side (never expose the user JWT in a URL)
+      const state = crypto.randomUUID() + crypto.randomUUID().replace(/-/g, "");
+      const sbAdmin = admin();
+      await sbAdmin.from("google_oauth_states").delete().lt(
+        "created_at",
+        new Date(Date.now() - 15 * 60 * 1000).toISOString(),
+      );
+      const { error: stateErr } = await sbAdmin
+        .from("google_oauth_states")
+        .insert({ state, user_id: user.id });
+      if (stateErr) return json({ error: "No se pudo iniciar la conexión" }, 500);
       const params = new URLSearchParams({
         client_id: GOOGLE_CLIENT_ID,
         redirect_uri: REDIRECT_URI,
