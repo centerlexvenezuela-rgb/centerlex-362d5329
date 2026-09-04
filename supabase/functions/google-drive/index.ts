@@ -255,11 +255,18 @@ Deno.serve(async (req) => {
       if (errorParam) return new Response(closeHtml(errorParam, false), { headers: { "Content-Type": "text/html" } });
       if (!code || !state) return new Response(closeHtml("Faltan parámetros", false), { headers: { "Content-Type": "text/html" } });
 
-      // verify state (= user JWT)
-      const sb = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-      const { data: claims } = await sb.auth.getClaims(state);
-      const userId = claims?.claims?.sub as string | undefined;
-      if (!userId) return new Response(closeHtml("Sesión inválida", false), { headers: { "Content-Type": "text/html" } });
+      // resolve + consume the single-use state stored server-side
+      const sbAdmin = admin();
+      const { data: stateRow } = await sbAdmin
+        .from("google_oauth_states")
+        .select("user_id, created_at")
+        .eq("state", state)
+        .maybeSingle();
+      await sbAdmin.from("google_oauth_states").delete().eq("state", state);
+      const fresh = stateRow &&
+        Date.now() - new Date(stateRow.created_at as string).getTime() < 15 * 60 * 1000;
+      const userId = fresh ? (stateRow!.user_id as string) : undefined;
+      if (!userId) return new Response(closeHtml("Sesión inválida o expirada", false), { headers: { "Content-Type": "text/html" } });
 
       const tok = await exchangeCode(code);
       if (!tok.refresh_token) {
