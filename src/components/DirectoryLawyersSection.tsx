@@ -12,6 +12,8 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Loader2, Upload, Trash2, Plus, Pencil, X, UserSquare2 } from "lucide-react";
 import { VENEZUELA_STATES } from "@/lib/venezuela";
 import { toast } from "sonner";
+import { useSpecialties } from "@/hooks/useSpecialties";
+import { SpecialtiesManagerDialog } from "@/components/SpecialtiesManagerDialog";
 
 const BUCKET = "branding";
 const MAX_MB = 5;
@@ -21,6 +23,8 @@ interface DirectoryLawyer {
   first_name: string | null;
   last_name: string | null;
   bar_association: string | null;
+  job_title: string | null;
+  specialty: string | null;
   city: string | null;
   state: string | null;
   whatsapp: string | null;
@@ -32,6 +36,8 @@ const emptyForm = {
   first_name: "",
   last_name: "",
   bar_association: "",
+  job_title: "",
+  specialty: "",
   city: "",
   state: "",
   whatsapp: "",
@@ -47,6 +53,7 @@ const pathFromPublicUrl = (url: string | null) => {
 };
 
 export const DirectoryLawyersSection = () => {
+  const { specialties, reload: reloadSpecialties } = useSpecialties();
   const [list, setList] = useState<DirectoryLawyer[]>([]);
   const [loading, setLoading] = useState(true);
   const [showForm, setShowForm] = useState(false);
@@ -82,6 +89,8 @@ export const DirectoryLawyersSection = () => {
       first_name: l.first_name ?? "",
       last_name: l.last_name ?? "",
       bar_association: l.bar_association ?? "",
+      job_title: l.job_title ?? "",
+      specialty: l.specialty ?? "",
       city: l.city ?? "",
       state: l.state ?? "",
       whatsapp: l.whatsapp ?? "",
@@ -127,6 +136,8 @@ export const DirectoryLawyersSection = () => {
       first_name: form.first_name.trim() || null,
       last_name: form.last_name.trim() || null,
       bar_association: form.bar_association.trim() || null,
+      job_title: form.job_title.trim() || null,
+      specialty: form.specialty || null,
       city: form.city.trim() || null,
       state: form.state || null,
       whatsapp: form.whatsapp.replace(/\D/g, "") || null,
@@ -182,11 +193,14 @@ export const DirectoryLawyersSection = () => {
             en el sistema de gestión jurídica. Se muestran igual que los abogados usuarios.
           </p>
         </div>
+        <div className="flex items-center gap-2">
+          <SpecialtiesManagerDialog onChanged={reloadSpecialties} />
         {!showForm && (
           <Button onClick={openNew} size="sm" className="bg-primary hover:bg-primary-glow">
             <Plus className="h-4 w-4 mr-2" /> Nuevo abogado
           </Button>
         )}
+        </div>
       </div>
 
       {showForm && (
@@ -254,13 +268,35 @@ export const DirectoryLawyersSection = () => {
             </div>
           </div>
 
+          <div className="grid gap-3 sm:grid-cols-2">
+            <div className="space-y-1.5">
+              <Label>Organización o Empresa</Label>
+              <Input
+                value={form.bar_association}
+                onChange={(e) => setForm({ ...form, bar_association: e.target.value })}
+                placeholder="Escritorio Jurídico Pérez & Asociados"
+              />
+            </div>
+            <div className="space-y-1.5">
+              <Label>Cargo</Label>
+              <Input
+                value={form.job_title}
+                onChange={(e) => setForm({ ...form, job_title: e.target.value })}
+                placeholder="Socio director"
+              />
+            </div>
+          </div>
+
           <div className="space-y-1.5">
-            <Label>Colegio de abogados</Label>
-            <Input
-              value={form.bar_association}
-              onChange={(e) => setForm({ ...form, bar_association: e.target.value })}
-              placeholder="Colegio de Abogados del Distrito Capital"
-            />
+            <Label>Especialidad</Label>
+            <Select value={form.specialty} onValueChange={(v) => setForm({ ...form, specialty: v })}>
+              <SelectTrigger><SelectValue placeholder="Selecciona especialidad…" /></SelectTrigger>
+              <SelectContent>
+                {specialties.map((s) => (
+                  <SelectItem key={s.id} value={s.name}>{s.name}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
           </div>
 
           <div className="grid gap-3 sm:grid-cols-2">
@@ -330,7 +366,7 @@ export const DirectoryLawyersSection = () => {
                   {[l.first_name, l.last_name].filter(Boolean).join(" ") || "Sin nombre"}
                 </p>
                 <p className="text-xs text-muted-foreground truncate">
-                  {[l.bar_association, [l.city, l.state].filter(Boolean).join(", ")].filter(Boolean).join(" · ") || "—"}
+                  {[l.job_title, l.bar_association, l.specialty, [l.city, l.state].filter(Boolean).join(", ")].filter(Boolean).join(" · ") || "—"}
                 </p>
                 {l.whatsapp && <p className="text-xs text-muted-foreground">WhatsApp: {l.whatsapp}</p>}
               </div>

@@ -13,6 +13,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Loader2, Upload } from "lucide-react";
 import { VENEZUELA_STATES } from "@/lib/venezuela";
 import { toast } from "sonner";
+import { useSpecialties } from "@/hooks/useSpecialties";
 
 interface Props {
   open: boolean;
@@ -24,6 +25,8 @@ interface Props {
     last_name: string | null;
     whatsapp: string | null;
     bar_association: string | null;
+    job_title: string | null;
+    specialty: string | null;
     city: string | null;
     state: string | null;
     photo_url: string | null;
@@ -32,10 +35,13 @@ interface Props {
 }
 
 export const EditLawyerDialog = ({ open, onOpenChange, lawyer, onSaved }: Props) => {
+  const { specialties } = useSpecialties();
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
   const [whatsapp, setWhatsapp] = useState("");
   const [bar, setBar] = useState("");
+  const [jobTitle, setJobTitle] = useState("");
+  const [specialty, setSpecialty] = useState("");
   const [city, setCity] = useState("");
   const [state, setState] = useState<string>("");
   const [photoUrl, setPhotoUrl] = useState<string | null>(null);
@@ -49,6 +55,8 @@ export const EditLawyerDialog = ({ open, onOpenChange, lawyer, onSaved }: Props)
       setLastName(lawyer.last_name ?? "");
       setWhatsapp(lawyer.whatsapp ?? "");
       setBar(lawyer.bar_association ?? "");
+      setJobTitle(lawyer.job_title ?? "");
+      setSpecialty(lawyer.specialty ?? "");
       setCity(lawyer.city ?? "");
       setState(lawyer.state ?? "");
       setPhotoUrl(lawyer.photo_url ?? null);
@@ -88,6 +96,8 @@ export const EditLawyerDialog = ({ open, onOpenChange, lawyer, onSaved }: Props)
         last_name: lastName.trim() || null,
         whatsapp: whatsapp.replace(/\D/g, "") || null,
         bar_association: bar.trim() || null,
+        job_title: jobTitle.trim() || null,
+        specialty: specialty || null,
         city: city.trim() || null,
         state: state || null,
         photo_url: photoUrl,
@@ -161,9 +171,27 @@ export const EditLawyerDialog = ({ open, onOpenChange, lawyer, onSaved }: Props)
             />
           </div>
 
+          <div className="grid gap-3 sm:grid-cols-2">
+            <div className="space-y-1.5">
+              <Label>Organización o Empresa</Label>
+              <Input value={bar} onChange={(e) => setBar(e.target.value)} placeholder="Escritorio Jurídico Pérez & Asociados" />
+            </div>
+            <div className="space-y-1.5">
+              <Label>Cargo</Label>
+              <Input value={jobTitle} onChange={(e) => setJobTitle(e.target.value)} placeholder="Socio director" />
+            </div>
+          </div>
+
           <div className="space-y-1.5">
-            <Label>Colegio de abogados</Label>
-            <Input value={bar} onChange={(e) => setBar(e.target.value)} placeholder="Colegio de Abogados del Distrito Capital" />
+            <Label>Especialidad</Label>
+            <Select value={specialty} onValueChange={setSpecialty}>
+              <SelectTrigger><SelectValue placeholder="Selecciona especialidad…" /></SelectTrigger>
+              <SelectContent>
+                {specialties.map((s) => (
+                  <SelectItem key={s.id} value={s.name}>{s.name}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
           </div>
 
           <div className="grid gap-3 sm:grid-cols-2">

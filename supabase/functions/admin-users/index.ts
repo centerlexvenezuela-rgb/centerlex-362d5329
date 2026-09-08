@@ -62,7 +62,7 @@ Deno.serve(async (req) => {
       const { data: roles } = await admin.from("user_roles").select("user_id, role");
       const { data: profiles } = await admin
         .from("profiles")
-        .select("user_id, first_name, last_name, ai_enabled, fees_enabled, prestaciones_enabled, islr_enabled, directory_enabled, whatsapp, bar_association, city, state, photo_url, cedula, inpreabogado, bar_number, phone, account_active, trial_ends_at");
+        .select("user_id, first_name, last_name, ai_enabled, fees_enabled, prestaciones_enabled, islr_enabled, directory_enabled, whatsapp, bar_association, job_title, specialty, city, state, photo_url, cedula, inpreabogado, bar_number, phone, account_active, trial_ends_at");
       const lawyers = list.users
         .map((u) => {
           const r = roles?.find((x) => x.user_id === u.id);
@@ -90,6 +90,8 @@ Deno.serve(async (req) => {
             directory_enabled: p?.directory_enabled ?? false,
             whatsapp: p?.whatsapp ?? null,
             bar_association: p?.bar_association ?? null,
+            job_title: p?.job_title ?? null,
+            specialty: p?.specialty ?? null,
             city: p?.city ?? null,
             state: p?.state ?? null,
             photo_url: p?.photo_url ?? null,
@@ -106,7 +108,7 @@ Deno.serve(async (req) => {
     }
 
     if (action === "create") {
-      const { email, password, first_name, last_name, whatsapp, bar_association, city, state, photo_url } = body;
+      const { email, password, first_name, last_name, whatsapp, bar_association, job_title, specialty, city, state, photo_url } = body;
       if (!email || !password || password.length < 6) {
         return new Response(
           JSON.stringify({ error: "Email y contraseña (mín. 6) requeridos" }),
@@ -133,6 +135,8 @@ Deno.serve(async (req) => {
         email,
         whatsapp: whatsapp ?? null,
         bar_association: bar_association ?? null,
+        job_title: job_title ?? null,
+        specialty: specialty ?? null,
         city: city ?? null,
         state: state ?? null,
         photo_url: photo_url ?? null,
@@ -148,7 +152,7 @@ Deno.serve(async (req) => {
     }
 
     if (action === "update_profile") {
-      const { user_id, first_name, last_name, whatsapp, bar_association, city, state, photo_url, cedula, inpreabogado, bar_number, phone } = body;
+      const { user_id, first_name, last_name, whatsapp, bar_association, job_title, specialty, city, state, photo_url, cedula, inpreabogado, bar_number, phone } = body;
       if (!user_id) {
         return new Response(JSON.stringify({ error: "user_id requerido" }), {
           status: 400,
@@ -160,6 +164,8 @@ Deno.serve(async (req) => {
       if (last_name !== undefined) patch.last_name = last_name || null;
       if (whatsapp !== undefined) patch.whatsapp = whatsapp || null;
       if (bar_association !== undefined) patch.bar_association = bar_association || null;
+      if (job_title !== undefined) patch.job_title = job_title || null;
+      if (specialty !== undefined) patch.specialty = specialty || null;
       if (city !== undefined) patch.city = city || null;
       if (state !== undefined) patch.state = state || null;
       if (photo_url !== undefined) patch.photo_url = photo_url || null;
