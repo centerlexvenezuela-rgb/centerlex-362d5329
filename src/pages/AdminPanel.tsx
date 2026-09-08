@@ -33,6 +33,7 @@ import { EditLawyerDialog } from "@/components/EditLawyerDialog";
 import { LawyerMobileList } from "@/components/LawyerMobileList";
 
 import { VENEZUELA_STATES } from "@/lib/venezuela";
+import { useSpecialties } from "@/hooks/useSpecialties";
 import { toast } from "sonner";
 
 interface Lawyer {
@@ -52,6 +53,8 @@ interface Lawyer {
   trial_expired: boolean;
   whatsapp: string | null;
   bar_association: string | null;
+  job_title: string | null;
+  specialty: string | null;
   city: string | null;
   state: string | null;
   photo_url: string | null;
@@ -59,6 +62,7 @@ interface Lawyer {
 
 const AdminPanel = () => {
   const navigate = useNavigate();
+  const { specialties } = useSpecialties();
   const { signOut, user } = useAuth();
   const [lawyers, setLawyers] = useState<Lawyer[]>([]);
   const [loading, setLoading] = useState(true);
@@ -71,6 +75,8 @@ const AdminPanel = () => {
   const [lastName, setLastName] = useState("");
   const [whatsapp, setWhatsapp] = useState("");
   const [bar, setBar] = useState("");
+  const [jobTitle, setJobTitle] = useState("");
+  const [specialty, setSpecialty] = useState("");
   const [city, setCity] = useState("");
   const [stateField, setStateField] = useState<string>("");
 
@@ -99,6 +105,8 @@ const AdminPanel = () => {
         last_name: lastName.trim() || null,
         whatsapp: whatsapp.replace(/\D/g, "") || null,
         bar_association: bar.trim() || null,
+        job_title: jobTitle.trim() || null,
+        specialty: specialty || null,
         city: city.trim() || null,
         state: stateField || null,
       },
@@ -109,7 +117,7 @@ const AdminPanel = () => {
     }
     toast.success(`Cuenta creada para ${email}`);
     setEmail(""); setPassword(""); setFirstName(""); setLastName("");
-    setWhatsapp(""); setBar(""); setCity(""); setStateField("");
+    setWhatsapp(""); setBar(""); setJobTitle(""); setSpecialty(""); setCity(""); setStateField("");
     load();
   };
 
@@ -289,12 +297,31 @@ const AdminPanel = () => {
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="ba">Colegio de abogados <span className="text-muted-foreground">(opcional)</span></Label>
+              <Label htmlFor="ba">Organización o Empresa <span className="text-muted-foreground">(opcional)</span></Label>
               <Input
                 id="ba" type="text"
                 value={bar} onChange={(e) => setBar(e.target.value)}
-                placeholder="Colegio de Abogados del Distrito Capital"
+                placeholder="Escritorio Jurídico Pérez & Asociados"
               />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="jt">Cargo <span className="text-muted-foreground">(opcional)</span></Label>
+              <Input
+                id="jt" type="text"
+                value={jobTitle} onChange={(e) => setJobTitle(e.target.value)}
+                placeholder="Socio director"
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="sp">Especialidad <span className="text-muted-foreground">(opcional)</span></Label>
+              <Select value={specialty} onValueChange={setSpecialty}>
+                <SelectTrigger id="sp"><SelectValue placeholder="Selecciona especialidad…" /></SelectTrigger>
+                <SelectContent>
+                  {specialties.map((s) => (
+                    <SelectItem key={s.id} value={s.name}>{s.name}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
             <div className="space-y-2">
               <Label htmlFor="ci">Ciudad <span className="text-muted-foreground">(opcional)</span></Label>
