@@ -13,6 +13,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Loader2, Upload, Trash2, ExternalLink, IdCard } from "lucide-react";
 import { VENEZUELA_STATES } from "@/lib/venezuela";
 import { toast } from "sonner";
+import { useSpecialties } from "@/hooks/useSpecialties";
 
 const BUCKET = "branding";
 const MAX_MB = 5;
@@ -27,6 +28,7 @@ const pathFromPublicUrl = (url: string | null) => {
 
 const DirectoryProfile = () => {
   const { user } = useAuth();
+  const { specialties } = useSpecialties();
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [uploading, setUploading] = useState(false);
@@ -36,6 +38,8 @@ const DirectoryProfile = () => {
   const [lastName, setLastName] = useState("");
   const [whatsapp, setWhatsapp] = useState("");
   const [bar, setBar] = useState("");
+  const [jobTitle, setJobTitle] = useState("");
+  const [specialty, setSpecialty] = useState("");
   const [city, setCity] = useState("");
   const [state, setState] = useState("");
   const [photoUrl, setPhotoUrl] = useState<string | null>(null);
@@ -46,7 +50,7 @@ const DirectoryProfile = () => {
     (async () => {
       const { data, error } = await supabase
         .from("profiles")
-        .select("first_name, last_name, whatsapp, bar_association, city, state, photo_url, directory_enabled")
+        .select("first_name, last_name, whatsapp, bar_association, job_title, specialty, city, state, photo_url, directory_enabled")
         .eq("user_id", user.id)
         .maybeSingle();
       setLoading(false);
@@ -56,6 +60,8 @@ const DirectoryProfile = () => {
       setLastName(data.last_name ?? "");
       setWhatsapp(data.whatsapp ?? "");
       setBar(data.bar_association ?? "");
+      setJobTitle((data as any).job_title ?? "");
+      setSpecialty((data as any).specialty ?? "");
       setCity(data.city ?? "");
       setState(data.state ?? "");
       setPhotoUrl(data.photo_url ?? null);
@@ -129,6 +135,8 @@ const DirectoryProfile = () => {
         last_name: lastName.trim() || null,
         whatsapp: whatsapp.replace(/\D/g, "") || null,
         bar_association: bar.trim() || null,
+        job_title: jobTitle.trim() || null,
+        specialty: specialty || null,
         city: city.trim() || null,
         state: state || null,
       })
@@ -220,9 +228,27 @@ const DirectoryProfile = () => {
               <p className="text-xs text-muted-foreground">A este número dirigirá el botón de WhatsApp del directorio.</p>
             </div>
 
+            <div className="grid gap-4 sm:grid-cols-2">
+              <div className="space-y-1.5">
+                <Label>Organización o Empresa</Label>
+                <Input value={bar} onChange={(e) => setBar(e.target.value)} placeholder="Escritorio Jurídico Pérez & Asociados" />
+              </div>
+              <div className="space-y-1.5">
+                <Label>Cargo</Label>
+                <Input value={jobTitle} onChange={(e) => setJobTitle(e.target.value)} placeholder="Socio director" />
+              </div>
+            </div>
+
             <div className="space-y-1.5">
-              <Label>Colegio de abogados</Label>
-              <Input value={bar} onChange={(e) => setBar(e.target.value)} placeholder="Colegio de Abogados del Distrito Capital" />
+              <Label>Especialidad</Label>
+              <Select value={specialty} onValueChange={setSpecialty}>
+                <SelectTrigger><SelectValue placeholder="Selecciona especialidad…" /></SelectTrigger>
+                <SelectContent>
+                  {specialties.map((s) => (
+                    <SelectItem key={s.id} value={s.name}>{s.name}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
 
             <div className="grid gap-4 sm:grid-cols-2">
