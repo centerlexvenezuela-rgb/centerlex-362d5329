@@ -229,9 +229,11 @@ export type Database = {
           created_at: string
           first_name: string | null
           id: string
+          job_title: string | null
           last_name: string | null
           photo_url: string | null
           published: boolean
+          specialty: string | null
           state: string | null
           updated_at: string
           whatsapp: string | null
@@ -242,9 +244,11 @@ export type Database = {
           created_at?: string
           first_name?: string | null
           id?: string
+          job_title?: string | null
           last_name?: string | null
           photo_url?: string | null
           published?: boolean
+          specialty?: string | null
           state?: string | null
           updated_at?: string
           whatsapp?: string | null
@@ -255,12 +259,38 @@ export type Database = {
           created_at?: string
           first_name?: string | null
           id?: string
+          job_title?: string | null
           last_name?: string | null
           photo_url?: string | null
           published?: boolean
+          specialty?: string | null
           state?: string | null
           updated_at?: string
           whatsapp?: string | null
+        }
+        Relationships: []
+      }
+      directory_specialties: {
+        Row: {
+          created_at: string
+          display_order: number
+          id: string
+          name: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          display_order?: number
+          id?: string
+          name: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          display_order?: number
+          id?: string
+          name?: string
+          updated_at?: string
         }
         Relationships: []
       }
@@ -588,10 +618,12 @@ export type Database = {
           id: string
           inpreabogado: string | null
           islr_enabled: boolean
+          job_title: string | null
           last_name: string | null
           phone: string | null
           photo_url: string | null
           prestaciones_enabled: boolean
+          specialty: string | null
           state: string | null
           trial_ends_at: string | null
           updated_at: string
@@ -617,10 +649,12 @@ export type Database = {
           id?: string
           inpreabogado?: string | null
           islr_enabled?: boolean
+          job_title?: string | null
           last_name?: string | null
           phone?: string | null
           photo_url?: string | null
           prestaciones_enabled?: boolean
+          specialty?: string | null
           state?: string | null
           trial_ends_at?: string | null
           updated_at?: string
@@ -646,10 +680,12 @@ export type Database = {
           id?: string
           inpreabogado?: string | null
           islr_enabled?: boolean
+          job_title?: string | null
           last_name?: string | null
           phone?: string | null
           photo_url?: string | null
           prestaciones_enabled?: boolean
+          specialty?: string | null
           state?: string | null
           trial_ends_at?: string | null
           updated_at?: string
@@ -687,9 +723,11 @@ export type Database = {
           city: string | null
           entry_id: string | null
           first_name: string | null
+          job_title: string | null
           last_name: string | null
           photo_url: string | null
           source: string | null
+          specialty: string | null
           state: string | null
           whatsapp: string | null
         }
