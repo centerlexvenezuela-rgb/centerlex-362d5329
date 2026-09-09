@@ -1,0 +1,1 @@
+REVOKE EXECUTE ON FUNCTION public.sync_profile_to_directory() FROM PUBLIC, anon, authenticated;
