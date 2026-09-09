@@ -10,6 +10,7 @@ import {
 import { Scale, MapPin, Phone, Search, Loader2, Locate, ExternalLink } from "lucide-react";
 import { VENEZUELA_STATES, nearestState } from "@/lib/venezuela";
 import { useBranding } from "@/hooks/useBranding";
+import { useSpecialties } from "@/hooks/useSpecialties";
 import { toast } from "sonner";
 
 interface Lawyer {
@@ -18,6 +19,8 @@ interface Lawyer {
   last_name: string | null;
   whatsapp: string | null;
   bar_association: string | null;
+  job_title: string | null;
+  specialty: string | null;
   city: string | null;
   state: string | null;
   photo_url: string | null;
@@ -25,10 +28,12 @@ interface Lawyer {
 
 const Directory = () => {
   const { branding } = useBranding();
+  const { specialties } = useSpecialties();
   const [lawyers, setLawyers] = useState<Lawyer[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
   const [stateFilter, setStateFilter] = useState<string>("all");
+  const [specialtyFilter, setSpecialtyFilter] = useState<string>("all");
   const [locating, setLocating] = useState(false);
   const ctaLabel = (branding.landing_content.directory_button_label ?? "").trim();
   const rawUrl = (branding.landing_content.directory_button_url ?? "").trim();
@@ -92,14 +97,16 @@ const Directory = () => {
         !q ||
         fullName.includes(q) ||
         (l.bar_association ?? "").toLowerCase().includes(q) ||
-        (l.city ?? "").toLowerCase().includes(q);
+        (l.city ?? "").toLowerCase().includes(q) ||
+        (l.specialty ?? "").toLowerCase().includes(q);
       const matchState = stateFilter === "all" || l.state === stateFilter;
-      return matchSearch && matchState;
+      const matchSpecialty = specialtyFilter === "all" || l.specialty === specialtyFilter;
+      return matchSearch && matchState && matchSpecialty;
     });
     // Si hay estado seleccionado, ya están filtrados; si no, orden alfabético.
     list.sort((a, b) => (a.first_name ?? "").localeCompare(b.first_name ?? ""));
     return list;
-  }, [lawyers, search, stateFilter]);
+  }, [lawyers, search, stateFilter, specialtyFilter]);
 
   return (
     <div className="min-h-screen bg-background">
@@ -141,7 +148,7 @@ const Directory = () => {
 
       <section className="max-w-6xl mx-auto px-4 sm:px-6 pb-6">
         <Card className="p-4 sm:p-5 shadow-elegant">
-          <div className="grid gap-3 md:grid-cols-[1fr,220px,auto]">
+          <div className="grid gap-3 md:grid-cols-2 lg:grid-cols-[1fr,200px,200px,auto]">
             <div className="relative">
               <Search className="h-4 w-4 absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
               <Input
@@ -159,6 +166,17 @@ const Directory = () => {
                 <SelectItem value="all">Todos los estados</SelectItem>
                 {VENEZUELA_STATES.map((s) => (
                   <SelectItem key={s.name} value={s.name}>{s.name}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+            <Select value={specialtyFilter} onValueChange={setSpecialtyFilter}>
+              <SelectTrigger>
+                <SelectValue placeholder="Filtrar por especialidad" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">Todas las especialidades</SelectItem>
+                {specialties.map((s) => (
+                  <SelectItem key={s.id} value={s.name}>{s.name}</SelectItem>
                 ))}
               </SelectContent>
             </Select>
@@ -200,10 +218,15 @@ const Directory = () => {
                     </Avatar>
                     <div className="min-w-0 flex-1">
                       <h3 className="font-serif text-lg leading-tight truncate">{fullName}</h3>
-                      {l.bar_association && (
+                      {(l.job_title || l.bar_association) && (
                         <p className="text-xs text-muted-foreground mt-0.5 line-clamp-2">
-                          {l.bar_association}
+                          {[l.job_title, l.bar_association].filter(Boolean).join(" · ")}
                         </p>
+                      )}
+                      {l.specialty && (
+                        <span className="inline-block mt-1.5 text-[11px] rounded-full border border-accent/40 bg-accent/10 px-2 py-0.5">
+                          {l.specialty}
+                        </span>
                       )}
                     </div>
                   </div>
