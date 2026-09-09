@@ -236,6 +236,7 @@ export type Database = {
           specialty: string | null
           state: string | null
           updated_at: string
+          user_id: string | null
           whatsapp: string | null
         }
         Insert: {
@@ -251,6 +252,7 @@ export type Database = {
           specialty?: string | null
           state?: string | null
           updated_at?: string
+          user_id?: string | null
           whatsapp?: string | null
         }
         Update: {
@@ -266,6 +268,7 @@ export type Database = {
           specialty?: string | null
           state?: string | null
           updated_at?: string
+          user_id?: string | null
           whatsapp?: string | null
         }
         Relationships: []
@@ -730,6 +733,32 @@ export type Database = {
           specialty: string | null
           state: string | null
           whatsapp: string | null
+        }
+        Insert: {
+          bar_association?: string | null
+          city?: string | null
+          entry_id?: never
+          first_name?: string | null
+          job_title?: string | null
+          last_name?: string | null
+          photo_url?: string | null
+          source?: never
+          specialty?: string | null
+          state?: string | null
+          whatsapp?: string | null
+        }
+        Update: {
+          bar_association?: string | null
+          city?: string | null
+          entry_id?: never
+          first_name?: string | null
+          job_title?: string | null
+          last_name?: string | null
+          photo_url?: string | null
+          source?: never
+          specialty?: string | null
+          state?: string | null
+          whatsapp?: string | null
         }
         Relationships: []
       }
