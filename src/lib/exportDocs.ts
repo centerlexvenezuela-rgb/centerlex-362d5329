@@ -73,7 +73,8 @@ export const exportToPDF = (title: string, html: string) => {
 };
 
 export const exportToDocx = async (title: string, html: string) => {
-  type JudicialLine = { text: string; bold?: boolean; alignment?: AlignmentType };
+  type AlignmentValue = (typeof AlignmentType)[keyof typeof AlignmentType];
+  type JudicialLine = { text: string; bold?: boolean; alignment?: AlignmentValue };
   const PAGE_WIDTH_DXA = 12_240;
   const PAGE_HEIGHT_DXA = 18_720;
   const MARGIN_SIDE_DXA = 1_417;
