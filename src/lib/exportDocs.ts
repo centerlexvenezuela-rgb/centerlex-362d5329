@@ -1,5 +1,5 @@
 import jsPDF from "jspdf";
-import { Document, Packer, Paragraph, TextRun, HeadingLevel, AlignmentType } from "docx";
+import { Document, Packer, Paragraph, TextRun, HeadingLevel, AlignmentType, SectionType, LineRuleType } from "docx";
 import { saveAs } from "file-saver";
 
 // Strip HTML to text segments (very lightweight, no external sanitizer needed for export)
@@ -73,35 +73,111 @@ export const exportToPDF = (title: string, html: string) => {
 };
 
 export const exportToDocx = async (title: string, html: string) => {
-  const paragraphs = htmlToPlainParagraphs(html);
-  const children: Paragraph[] = [
-    new Paragraph({
-      children: [new TextRun({ text: title, bold: true, size: 32, font: "Times New Roman" })],
-      alignment: AlignmentType.CENTER,
-      spacing: { after: 300 },
-    }),
-  ];
+  type JudicialLine = { text: string; bold?: boolean; alignment?: AlignmentType };
+  const PAGE_WIDTH_DXA = 12_240;
+  const PAGE_HEIGHT_DXA = 18_720;
+  const MARGIN_SIDE_DXA = 1_417;
+  const MARGIN_TOP_DXA = 2_835;
+  const MARGIN_BOTTOM_DXA = 1_134;
+  const CONTENT_WIDTH_PX = ((PAGE_WIDTH_DXA - (MARGIN_SIDE_DXA * 2)) / 1_440) * 96;
 
-  paragraphs.forEach((p) => {
-    if (!p.text) { children.push(new Paragraph({ text: "" })); return; }
-    const align = p.align === "center" ? AlignmentType.CENTER : p.align === "right" ? AlignmentType.RIGHT : p.align === "justify" ? AlignmentType.JUSTIFIED : AlignmentType.LEFT;
-    if (p.heading) {
-      children.push(new Paragraph({
-        children: [new TextRun({ text: p.text, bold: true, font: "Times New Roman", size: p.heading === 1 ? 32 : p.heading === 2 ? 28 : 26 })],
-        heading: p.heading === 1 ? HeadingLevel.HEADING_1 : p.heading === 2 ? HeadingLevel.HEADING_2 : HeadingLevel.HEADING_3,
-        alignment: align,
-        spacing: { before: 200, after: 120 },
-      }));
-    } else {
-      children.push(new Paragraph({
-        children: [new TextRun({ text: p.text, font: "Times New Roman", size: 24 })],
-        alignment: align,
-        spacing: { after: 120 },
-      }));
+  const canvas = document.createElement("canvas");
+  const context = canvas.getContext("2d");
+  if (context) context.font = "16px Arial";
+  const measure = (text: string) => context?.measureText(text).width ?? text.length * 8;
+
+  const wrap = (text: string, prefix = ""): string[] => {
+    const words = text.trim().split(/\s+/).filter(Boolean);
+    if (words.length === 0) return [""];
+    const lines: string[] = [];
+    let line = prefix;
+    for (const word of words) {
+      const candidate = line ? `${line} ${word}` : word;
+      if (measure(candidate) <= CONTENT_WIDTH_PX) {
+        line = candidate;
+        continue;
+      }
+      if (line) lines.push(line);
+      if (measure(word) <= CONTENT_WIDTH_PX) {
+        line = word;
+        continue;
+      }
+      let fragment = "";
+      for (const character of word) {
+        if (fragment && measure(fragment + character) > CONTENT_WIDTH_PX) {
+          lines.push(fragment);
+          fragment = character;
+        } else {
+          fragment += character;
+        }
+      }
+      line = fragment;
     }
+    if (line) lines.push(line);
+    return lines;
+  };
+
+  const lines: JudicialLine[] = wrap(title).map((text) => ({
+    text,
+    bold: true,
+    alignment: AlignmentType.CENTER,
+  }));
+  const paragraphs = htmlToPlainParagraphs(html);
+  paragraphs.forEach((paragraph) => {
+    if (!paragraph.text) {
+      lines.push({ text: "", alignment: AlignmentType.JUSTIFIED });
+      return;
+    }
+    const normalized = paragraph.text.replace(/^•\s*/, "- ");
+    wrap(normalized).forEach((text) => lines.push({
+      text,
+      bold: Boolean(paragraph.heading),
+      alignment: paragraph.align === "center"
+        ? AlignmentType.CENTER
+        : paragraph.align === "right"
+          ? AlignmentType.RIGHT
+          : AlignmentType.JUSTIFIED,
+    }));
   });
 
-  const doc = new Document({ sections: [{ properties: {}, children }] });
+  const pages: JudicialLine[][] = [];
+  let offset = 0;
+  while (offset < lines.length) {
+    const pageNumber = pages.length + 1;
+    const capacity = pageNumber % 2 === 1 ? 30 : 34;
+    pages.push(lines.slice(offset, offset + capacity));
+    offset += capacity;
+  }
+  if (pages.length === 0) pages.push([]);
+
+  const sections = pages.map((pageLines, index) => {
+    const pageNumber = index + 1;
+    const lineSpacing = pageNumber % 2 === 1 ? 491 : 433;
+    return {
+      properties: {
+        type: index === 0 ? undefined : SectionType.NEXT_PAGE,
+        page: {
+          size: { width: PAGE_WIDTH_DXA, height: PAGE_HEIGHT_DXA },
+          margin: {
+            top: MARGIN_TOP_DXA,
+            right: MARGIN_SIDE_DXA,
+            bottom: MARGIN_BOTTOM_DXA,
+            left: MARGIN_SIDE_DXA,
+          },
+        },
+      },
+      children: pageLines.map((line) => new Paragraph({
+        children: [new TextRun({ text: line.text, bold: line.bold, font: "Arial", size: 24 })],
+        alignment: line.alignment ?? AlignmentType.JUSTIFIED,
+        spacing: { before: 0, after: 0, line: lineSpacing, lineRule: LineRuleType.EXACT },
+      })),
+    };
+  });
+
+  const doc = new Document({
+    styles: { default: { document: { run: { font: "Arial", size: 24 } } } },
+    sections,
+  });
   const blob = await Packer.toBlob(doc);
   saveAs(blob, `${title.replace(/[^\w\d-_ ]/g, "")}.docx`);
 };
