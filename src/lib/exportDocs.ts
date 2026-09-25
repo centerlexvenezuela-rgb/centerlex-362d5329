@@ -1,5 +1,5 @@
 import jsPDF from "jspdf";
-import { Document, Packer, Paragraph, TextRun, HeadingLevel, AlignmentType, SectionType, LineRuleType } from "docx";
+import { Document, Packer, Paragraph, TextRun, HeadingLevel, AlignmentType, LineRuleType } from "docx";
 import { saveAs } from "file-saver";
 
 // Strip HTML to text segments (very lightweight, no external sanitizer needed for export)
@@ -151,12 +151,21 @@ export const exportToDocx = async (title: string, html: string) => {
   }
   if (pages.length === 0) pages.push([]);
 
-  const sections = pages.map((pageLines, index) => {
+  const judicialParagraphs = pages.flatMap((pageLines, index) => {
     const pageNumber = index + 1;
     const lineSpacing = pageNumber % 2 === 1 ? 491 : 433;
-    return {
+    return pageLines.map((line, lineIndex) => new Paragraph({
+        children: [new TextRun({ text: line.text, bold: line.bold, font: "Arial", size: 24 })],
+        alignment: line.alignment ?? AlignmentType.JUSTIFIED,
+        pageBreakBefore: index > 0 && lineIndex === 0,
+        spacing: { before: 0, after: 0, line: lineSpacing, lineRule: LineRuleType.EXACT },
+      }));
+  });
+
+  const doc = new Document({
+    styles: { default: { document: { run: { font: "Arial", size: 24 } } } },
+    sections: [{
       properties: {
-        type: index === 0 ? undefined : SectionType.NEXT_PAGE,
         page: {
           size: { width: PAGE_WIDTH_DXA, height: PAGE_HEIGHT_DXA },
           margin: {
@@ -167,17 +176,8 @@ export const exportToDocx = async (title: string, html: string) => {
           },
         },
       },
-      children: pageLines.map((line) => new Paragraph({
-        children: [new TextRun({ text: line.text, bold: line.bold, font: "Arial", size: 24 })],
-        alignment: line.alignment ?? AlignmentType.JUSTIFIED,
-        spacing: { before: 0, after: 0, line: lineSpacing, lineRule: LineRuleType.EXACT },
-      })),
-    };
-  });
-
-  const doc = new Document({
-    styles: { default: { document: { run: { font: "Arial", size: 24 } } } },
-    sections,
+      children: judicialParagraphs,
+    }],
   });
   const blob = await Packer.toBlob(doc);
   saveAs(blob, `${title.replace(/[^\w\d-_ ]/g, "")}.docx`);
